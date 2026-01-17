@@ -221,7 +221,7 @@ export default function WritePage() {
           href="/"
           className="flex items-center gap-2 text-[#CB997E] text-sm font-bold hover:text-[#FF9F1C] transition-colors group"
         >
-          <Home className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <Home className="w-4 h-4 transition-colors" />
           Home
         </Link>
 
@@ -229,6 +229,12 @@ export default function WritePage() {
           <span className="text-sm text-[#CB997E] font-bold">
             {text.length} characters
           </span>
+          <Link
+            href="/reflection"
+            className="px-6 py-2.5 text-sm font-medium text-[#FF9F1C] border border-[#FF9F1C]/40 rounded-full hover:bg-[#FF9F1C] hover:text-white transition-all duration-300 hover:border-[#FF9F1C]"
+          >
+            Reflection
+          </Link>
         </div>
       </header>
 
