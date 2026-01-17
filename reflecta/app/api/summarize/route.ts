@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `You are a compassionate mental health journal analyzer. Read the following journal entry and provide a warm, empathetic summary in 4-7 sentences. Focus on:
 1. The overall emotional tone and mood
