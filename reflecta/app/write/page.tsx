@@ -3,33 +3,39 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Mic, MicOff, Save, Home } from "lucide-react";
+import { supabase } from "../../lib/supabase-browser";
 
 export default function WritePage() {
   const [text, setText] = useState("");
-  const [saved, setSaved] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [entryId, setEntryId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     // Check if speech recognition is supported
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (typeof window !== "undefined") {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition ||
+        (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
         setIsSupported(true);
         recognitionRef.current = new SpeechRecognition();
         recognitionRef.current.continuous = true;
         recognitionRef.current.interimResults = true;
-        recognitionRef.current.lang = 'en-US';
+        recognitionRef.current.lang = "en-US";
 
         recognitionRef.current.onresult = (event: any) => {
-          let interimTranscript = '';
-          let finalTranscript = '';
+          let interimTranscript = "";
+          let finalTranscript = "";
 
           for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-              finalTranscript += transcript + ' ';
+              finalTranscript += transcript + " ";
             } else {
               interimTranscript += transcript;
             }
@@ -41,7 +47,7 @@ export default function WritePage() {
         };
 
         recognitionRef.current.onerror = (event: any) => {
-          console.error('Speech recognition error:', event.error);
+          console.error("Speech recognition error:", event.error);
           setIsRecording(false);
         };
 
@@ -58,14 +64,115 @@ export default function WritePage() {
     };
   }, []);
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const getLocalISODate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const loadTodayEntry = async (currentUserId: string) => {
+    const today = getLocalISODate();
+    const { data, error } = await supabase!
+      .from("journals")
+      .select("id, content")
+      .eq("user_id", currentUserId)
+      .eq("entry_date", today)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Failed to load journal entry:", error);
+      return;
+    }
+
+    if (data?.content) {
+      setEntryId(data.id);
+      setText(data.content);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    const init = async () => {
+      if (!supabase) {
+        setStatusMessage("App misconfigured. Missing Supabase keys.");
+        return;
+      }
+      const { data } = await supabase.auth.getUser();
+      if (!isMounted) return;
+      const user = data.user;
+      if (!user) {
+        setUserId(null);
+        setStatusMessage("Please log in to save your journal.");
+        return;
+      }
+      setUserId(user.id);
+      setStatusMessage(null);
+      await loadTodayEntry(user.id);
+    };
+    init();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleSave = async () => {
+    if (!supabase) {
+      setStatusMessage("App misconfigured. Missing Supabase keys.");
+      return;
+    }
+    if (!userId) {
+      setStatusMessage("Please log in to save your journal.");
+      return;
+    }
+    const trimmed = text.trim();
+    if (!trimmed) {
+      setStatusMessage("Write something before saving.");
+      return;
+    }
+    setIsSaving(true);
+    setStatusMessage(null);
+    const today = getLocalISODate();
+    try {
+      if (entryId) {
+        const { error } = await supabase
+          .from("journals")
+          .update({ content: trimmed })
+          .eq("id", entryId);
+        if (error) {
+          setStatusMessage("Couldn't save. Please try again.");
+          return;
+        }
+      } else {
+        const { data, error } = await supabase
+          .from("journals")
+          .insert({
+            user_id: userId,
+            entry_date: today,
+            content: trimmed,
+          })
+          .select("id")
+          .single();
+        if (error) {
+          setStatusMessage("Couldn't save. Please try again.");
+          return;
+        }
+        setEntryId(data?.id ?? null);
+      }
+      setStatusMessage("Saved.");
+    } catch {
+      setStatusMessage("Couldn't save. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const toggleRecording = () => {
     if (!isSupported) {
-      alert('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
+      setStatusMessage(
+        "Speech recognition is not supported in this browser. Try Chrome, Edge, or Safari.",
+      );
       return;
     }
 
@@ -127,7 +234,7 @@ export default function WritePage() {
               onChange={(e) => setText(e.target.value)}
               placeholder="Write freely or click the microphone to speak your thoughts..."
               className="w-full min-h-[65vh] resize-none p-8 md:p-12 text-lg md:text-xl text-[#CB997E] placeholder:text-[#CB997E]/50 bg-transparent focus:outline-none leading-relaxed"
-              style={{ fontFamily: 'inherit' }}
+              style={{ fontFamily: "inherit" }}
             />
 
             {/* Action bar */}
@@ -137,8 +244,8 @@ export default function WritePage() {
                   onClick={toggleRecording}
                   className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all group ${
                     isRecording
-                      ? 'bg-red-500 text-white shadow-lg animate-pulse'
-                      : 'border border-[#CB997E]/40 text-[#CB997E] hover:bg-[#CB997E]/10'
+                      ? "bg-red-500 text-white shadow-lg animate-pulse"
+                      : "border border-[#CB997E]/40 text-[#CB997E] hover:bg-[#CB997E]/10"
                   }`}
                 >
                   {isRecording ? (
@@ -156,18 +263,18 @@ export default function WritePage() {
 
                 <button
                   onClick={handleSave}
-                  disabled={!text.trim()}
+                  disabled={!text.trim() || isSaving || !userId}
                   className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#FF9F1C] text-white font-medium hover:bg-[#FFBF69] transition-all shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 group"
                 >
                   <Save className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                  Save Entry
+                  {isSaving ? "Saving..." : "Save Entry"}
                 </button>
               </div>
 
-              {saved && (
+              {statusMessage && (
                 <div className="mt-4 text-center">
-                  <p className="text-sm text-[#CB997E] italic animate-pulse">
-                    ✓ Entry saved successfully
+                  <p className="text-sm text-[#CB997E] italic">
+                    {statusMessage}
                   </p>
                 </div>
               )}
@@ -186,7 +293,7 @@ export default function WritePage() {
           {/* Helper text */}
           <div className="mt-8 text-center">
             <p className="text-sm text-[#CB997E]/60 font-light italic">
-              {isSupported 
+              {isSupported
                 ? "Your words are private and secure. Write or speak what's on your mind."
                 : "Your words are private and secure. Write what's on your mind."}
             </p>
