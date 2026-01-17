@@ -61,7 +61,7 @@ function ShiftDot(
   const fill = isShift ? "#FF9F1C" : "#CB997E";
   const stroke = isSelected ? "#FF9F1C" : "#FFBF69";
   const strokeWidth = isShift ? 3 : 0;
-  const hitRadius = isShift ? 14 : 12;
+  const hitRadius = isShift ? 20 : 16;
 
   const handleClick = () => {
     if (!payload.journalId) return;
@@ -72,14 +72,15 @@ function ShiftDot(
   if (!isShift) {
     return (
       <g style={{ cursor: "pointer" }}>
+        <circle cx={cx} cy={cy} r={size} fill={fill} opacity={0.7} />
         <circle
           cx={cx}
           cy={cy}
           r={hitRadius}
           fill="transparent"
           onClick={handleClick}
+          style={{ pointerEvents: 'all' }}
         />
-        <circle cx={cx} cy={cy} r={size} fill={fill} opacity={0.7} />
       </g>
     );
   }
@@ -89,17 +90,18 @@ function ShiftDot(
       <circle
         cx={cx}
         cy={cy}
-        r={hitRadius}
-        fill="transparent"
-        onClick={handleClick}
-      />
-      <circle
-        cx={cx}
-        cy={cy}
         r={size}
         fill={fill}
         stroke={stroke}
         strokeWidth={strokeWidth}
+      />
+      <circle
+        cx={cx}
+        cy={cy}
+        r={hitRadius}
+        fill="transparent"
+        onClick={handleClick}
+        style={{ pointerEvents: 'all' }}
       />
     </g>
   );
