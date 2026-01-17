@@ -90,12 +90,12 @@ export default function IdentityShiftTimeline({
           data={points}
           margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="4 8" opacity={0.25} />
+          <CartesianGrid strokeDasharray="4 8" stroke="#CB997E" opacity={0.2} />
           <XAxis
             dataKey="date"
             tickLine={false}
             axisLine={false}
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 12, fill: "#CB997E" }}
             interval="preserveStartEnd"
             minTickGap={18}
           />
@@ -103,7 +103,7 @@ export default function IdentityShiftTimeline({
             domain={[0, 100]}
             tickLine={false}
             axisLine={false}
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 12, fill: "#CB997E" }}
             width={32}
           />
           <Tooltip
@@ -111,9 +111,14 @@ export default function IdentityShiftTimeline({
             formatter={formatTooltipValue}
             contentStyle={{
               borderRadius: 12,
-              border: "1px solid rgba(0,0,0,0.08)",
+              border: "1px solid rgba(203, 153, 126, 0.3)",
               background: "rgba(255, 255, 255, 0.95)",
-              boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+              boxShadow: "0 8px 30px rgba(255, 159, 28, 0.15)",
+              color: "#CB997E",
+            }}
+            labelStyle={{
+              color: "#CB997E",
+              fontWeight: 500,
             }}
           />
           <Line
@@ -127,7 +132,7 @@ export default function IdentityShiftTimeline({
                 onSelectShift={onSelectShift}
               />
             }
-            activeDot={{ r: 7 }}
+            activeDot={{ r: 7, fill: "#FF9F1C" }}
           />
         </LineChart>
       </ResponsiveContainer>

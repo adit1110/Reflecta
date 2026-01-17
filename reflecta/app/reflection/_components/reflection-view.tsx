@@ -40,22 +40,22 @@ export default function ReflectionView() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-black/5 sm:p-5">
+      <section className="rounded-3xl bg-white/60 backdrop-blur-md p-4 shadow-2xl border border-[#CB997E]/20 sm:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-sm font-medium text-neutral-900">
+            <h2 className="text-base font-medium text-[#CB997E]">
               Month view
             </h2>
-            <p className="mt-1 text-xs text-neutral-600">
+            <p className="mt-1 text-sm text-[#CB997E]/70 font-light">
               Choose a month to see the shifts that stood out.
             </p>
           </div>
-          <label className="text-sm text-neutral-700">
+          <label className="text-sm text-[#CB997E]">
             <span className="sr-only">Select month</span>
             <select
               value={selectedMonthKey}
               onChange={(event) => setSelectedMonthKey(event.target.value)}
-              className="w-full min-w-[220px] rounded-xl border border-black/10 bg-white/80 px-3 py-2 text-sm text-neutral-900 outline-none transition focus:border-[#FF9F1C]/40 focus:ring-2 focus:ring-[#FF9F1C]/30"
+              className="w-full min-w-[220px] rounded-xl border border-[#CB997E]/30 bg-white/80 px-3 py-2 text-sm text-[#CB997E] outline-none transition focus:border-[#FF9F1C] focus:ring-2 focus:ring-[#FF9F1C]/30"
             >
               {availableMonths.map((monthKey) => (
                 <option key={monthKey} value={monthKey}>
@@ -67,11 +67,11 @@ export default function ReflectionView() {
         </div>
       </section>
 
-      <section className="min-w-0 rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-black/5 sm:p-6">
-        <h2 className="text-base font-medium text-neutral-900">
+      <section className="min-w-0 rounded-3xl bg-white/60 backdrop-blur-md p-4 shadow-2xl border border-[#CB997E]/20 sm:p-6">
+        <h2 className="text-lg font-light text-[#CB997E]">
           Identity Shift Timeline
         </h2>
-        <p className="mt-1 text-sm text-neutral-700">
+        <p className="mt-1 text-sm text-[#CB997E]/70 font-light">
           Hover for details. Click a highlighted day to focus it.
         </p>
 
