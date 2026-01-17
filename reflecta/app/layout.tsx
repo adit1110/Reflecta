@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Crimson_Pro } from "next/font/google";
+
+
+const crimson = Crimson_Pro({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-crimson",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${crimson.variable} antialiased`}
       >
         {children}
       </body>
