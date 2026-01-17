@@ -120,15 +120,44 @@ export default function WritePage() {
             </div>
           </div>
 
-          {/* Writing card */}
-          <div className="bg-white/60 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 shadow-2xl overflow-hidden">
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Write freely or click the microphone to speak your thoughts..."
-              className="w-full min-h-[65vh] resize-none p-8 md:p-12 text-lg md:text-xl text-[#CB997E] placeholder:text-[#CB997E]/50 bg-transparent focus:outline-none leading-relaxed"
-              style={{ fontFamily: 'inherit' }}
-            />
+          {/* Notebook card with spiral binding */}
+          <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden">
+            {/* Spiral binding holes */}
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#FFE8D6] to-transparent flex flex-col justify-start gap-8 pt-8 items-center z-10">
+              {[...Array(12)].map((_, i) => (
+                <div key={i} className="relative">
+                  {/* Hole shadow */}
+                  <div className="w-6 h-6 rounded-full bg-[#CB997E]/30 blur-sm absolute inset-0"></div>
+                  {/* Hole */}
+                  <div className="w-6 h-6 rounded-full border-2 border-[#CB997E]/40 bg-[#FFE8D6] relative"></div>
+                  {/* Inner shadow */}
+                  <div className="w-3 h-3 rounded-full bg-[#CB997E]/20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Notebook paper with lines */}
+            <div className="relative pl-16 pr-8">
+              {/* Red margin line */}
+              <div className="absolute left-20 top-0 bottom-0 w-[2px] bg-[#FF9F1C]/30"></div>
+
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Write freely or click the microphone to speak your thoughts..."
+                className="w-full min-h-[65vh] resize-none p-8 md:p-12 pl-8 text-lg md:text-xl text-[#CB997E] placeholder:text-[#CB997E]/40 bg-transparent focus:outline-none leading-[2.5rem] relative z-20"
+                style={{
+                  fontFamily: 'inherit',
+                  backgroundImage: `repeating-linear-gradient(
+                    transparent,
+                    transparent 2.4rem,
+                    #CB997E15 2.4rem,
+                    #CB997E15 2.5rem
+                  )`,
+                  backgroundAttachment: 'local',
+                }}
+              />
+            </div>
 
             {/* Action bar */}
             <div className="px-8 md:px-12 py-6 bg-gradient-to-r from-[#FFF5EC] to-[#FFE8D6] border-t border-[#CB997E]/10">
