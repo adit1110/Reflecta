@@ -7,9 +7,11 @@ import Link from "next/link";
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
   const [currentYear, setCurrentYear] = useState(2026);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
+    setIsVisible(true);
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -31,7 +33,7 @@ export default function Home() {
       <div className="fixed bottom-20 left-20 w-80 h-80 bg-[#FF9F1C]/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Navigation */}
-      <nav className="relative z-10 flex items-center justify-between px-6 md:px-12 py-8 max-w-7xl mx-auto">
+      <nav className={`relative z-10 flex items-center justify-between px-6 md:px-12 py-8 max-w-7xl mx-auto transition-all duration-1000 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
         <div className="flex items-center gap-2">
           <Sparkles className="w-6 h-6 text-[#FF9F1C]" strokeWidth={1.5} />
           <span className="text-2xl font-light tracking-tight text-[#CB997E]">
@@ -47,14 +49,16 @@ export default function Home() {
       <main className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 pt-16 md:pt-32 pb-32">
         {/* Main headline */}
         <div className="space-y-10 mb-24">
-          <div className="inline-block">
+          {/* Badge - Animated from left */}
+          <div className={`inline-block transition-all duration-1000 delay-100 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
             <div className="flex items-center gap-2 px-4 py-2 bg-white/40 backdrop-blur-sm rounded-full border border-[#FF9F1C]/30 mb-8">
               <div className="w-2 h-2 bg-[#FF9F1C] rounded-full animate-pulse" />
               <span className="text-sm font-medium text-[#CB997E]">AI-Powered Mental Health Timeline</span>
             </div>
           </div>
           
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-light leading-[0.95] tracking-tight text-[#CB997E] max-w-5xl">
+          {/* Main Headline - Animated from left */}
+          <h1 className={`text-6xl md:text-8xl lg:text-9xl font-light leading-[0.95] tracking-tight text-[#CB997E] max-w-5xl transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
             Your emotional
             <br />
             <span className="italic font-light text-[#FF9F1C] relative">
@@ -67,14 +71,15 @@ export default function Home() {
             evolves daily
           </h1>
           
-          <p className="text-xl md:text-2xl font-light text-[#CB997E]/80 max-w-2xl leading-relaxed">
+          {/* Subheadline - Animated from left */}
+          <p className={`text-xl md:text-2xl font-light text-[#CB997E]/80 max-w-2xl leading-relaxed transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
             Turn private journaling into an intelligent timeline that reveals 
             patterns in how you feel, think, and grow.
           </p>
         </div>
 
-        {/* CTA */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-40">
+        {/* CTA - Animated from left */}
+        <div className={`flex flex-col sm:flex-row gap-4 mb-40 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
           <button className="group px-8 py-5 bg-[#FF9F1C] text-white rounded-full text-lg font-medium hover:bg-[#FFBF69] transition-all duration-300 hover:shadow-2xl hover:scale-105 flex items-center justify-center gap-2">
             Start Writing Today
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" strokeWidth={2} />
@@ -84,9 +89,9 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Key Features - Enhanced Cards */}
+        {/* Key Features - Enhanced Cards with Staggered Animation from left */}
         <div className="grid md:grid-cols-3 gap-6 mb-40">
-          <div className="group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
+          <div className={`group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`} style={{ transitionDelay: '900ms' }}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#FF9F1C]/10 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity duration-500" />
             <div className="relative">
               <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#FF9F1C]/20 to-[#FFBF69]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -101,7 +106,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
+          <div className={`group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`} style={{ transitionDelay: '1050ms' }}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#FFBF69]/10 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity duration-500" />
             <div className="relative">
               <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#FFBF69]/20 to-[#FF9F1C]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -116,7 +121,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
+          <div className={`group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`} style={{ transitionDelay: '1200ms' }}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#CB997E]/10 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity duration-500" />
             <div className="relative">
               <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#CB997E]/20 to-[#FF9F1C]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -132,8 +137,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="text-center">
+        {/* Bottom CTA - Animated from left */}
+        <div className={`text-center transition-all duration-1000 delay-[1400ms] ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
           <div className="inline-block mb-8 px-6 py-3 bg-white/40 backdrop-blur-sm rounded-full border border-[#CB997E]/20">
             <p className="text-lg text-[#CB997E]/80 font-light italic">
               People may not talk — but they will write.
