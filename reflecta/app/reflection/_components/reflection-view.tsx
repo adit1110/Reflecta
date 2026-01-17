@@ -30,6 +30,49 @@ export default function ReflectionView() {
     [selectedMonthKey],
   );
 
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
+  const [videoNarrative, setVideoNarrative] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
+
+  const selectedPoint = useMemo(() => {
+    if (!selectedShiftIsoDate) return null;
+    return monthPoints.find((point) => point.isoDate === selectedShiftIsoDate);
+  }, [monthPoints, selectedShiftIsoDate]);
+
+  const narrativeText = selectedPoint?.label ?? "A quiet shift in perspective that shaped the day.";
+
+  const generateReflectionVideo = async () => {
+  if (!narrativeText) return;
+
+  setIsGeneratingVideo(true);
+  setVideoUrl(null);
+  setVideoError(null);
+
+  try {
+    const res = await fetch("/api/video/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ narrativeText }),
+    });
+
+    const data = await res.json();
+
+    if (data.videoUrl) {
+      setVideoUrl(data.videoUrl);
+      setVideoNarrative(narrativeText);
+    } else if (data.error) {
+      setVideoError(data.error);
+    } else {
+      setVideoError("Video could not be generated.");
+    }
+  } catch (err) {
+    setVideoError("Network error while generating video.");
+  } finally {
+    setIsGeneratingVideo(false);
+  }
+};
+
   useEffect(() => {
     if (!selectedShiftIsoDate) return;
     const stillVisible = monthPoints.some(
@@ -67,6 +110,30 @@ export default function ReflectionView() {
         </div>
       </section>
 
+      {selectedPoint && (
+          <section className="rounded-2xl bg-white/60 backdrop-blur-md p-4 shadow-lg border border-[#CB997E]/20">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm text-[#CB997E] font-medium">
+                  {selectedPoint.date}
+                </p>
+                <p className="text-sm text-[#CB997E]/70 font-light">
+                  {selectedPoint.label}
+                </p>
+              </div>
+
+              <button
+                onClick={generateReflectionVideo}
+                disabled={isGeneratingVideo}
+                className="rounded-full px-5 py-2 text-sm font-medium bg-[#FF9F1C] text-white hover:bg-[#FFBF69] transition disabled:opacity-50"
+              >
+                {isGeneratingVideo ? "Generating…" : "Generate Reflection Video"}
+              </button>
+            </div>
+          </section>
+        )}
+
+
       <section className="min-w-0 rounded-3xl bg-white/60 backdrop-blur-md p-4 shadow-2xl border border-[#CB997E]/20 sm:p-6">
         <h2 className="text-lg font-light text-[#CB997E]">
           Identity Shift Timeline
@@ -89,6 +156,68 @@ export default function ReflectionView() {
         selectedIsoDate={selectedShiftIsoDate}
         onSelectShift={setSelectedShiftIsoDate}
       />
+
+      {videoError && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center">
+    {/* Background overlay */}
+    <div
+      className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+      onClick={() => setVideoError(null)}
+    />
+
+    {/* Error modal */}
+    <div className="relative z-10 w-full max-w-md mx-4 rounded-3xl bg-white shadow-2xl border border-[#CB997E]/20 p-6 animate-in fade-in zoom-in duration-200">
+      <p className="text-base font-medium text-[#CB997E] text-center">
+        Reflection video not available
+      </p>
+
+      <p className="mt-3 text-sm text-[#CB997E]/70 font-light text-center">
+        {videoError}
+      </p>
+
+      <div className="mt-6 flex justify-center gap-4">
+        <button
+          onClick={generateReflectionVideo}
+          className="rounded-full px-5 py-2 text-sm font-medium bg-[#FF9F1C] text-white hover:bg-[#FFBF69] transition"
+        >
+          Try again
+        </button>
+
+        <button
+          onClick={() => setVideoError(null)}
+          className="rounded-full px-5 py-2 text-sm font-medium border border-[#CB997E]/40 text-[#CB997E] hover:bg-[#CB997E]/10 transition"
+        >
+          Dismiss
+        </button>
+      </div>
     </div>
+  </div>
+)}
+
+
+      {videoUrl && !videoError && (
+        <section className="fixed inset-x-4 bottom-6 z-50 sm:right-6 sm:w-[420px]">
+          <div className="rounded-3xl bg-white shadow-2xl border border-[#CB997E]/20 overflow-hidden">
+            <div className="p-4 border-b border-[#CB997E]/20">
+              <p className="text-sm font-medium text-[#CB997E]">
+                Reflection Video
+              </p>
+
+              {videoNarrative && (
+                <p className="mt-1 text-xs text-[#CB997E]/70 font-light">
+                  {videoNarrative}
+                </p>
+              )}
+            </div>
+
+            <video
+              src={videoUrl}
+              controls
+              className="w-full h-auto"
+            />
+          </div>
+        </section>
+      )}
+          </div>
   );
 }
