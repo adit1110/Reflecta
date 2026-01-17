@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   LineChart,
   Line,
@@ -15,7 +16,7 @@ import type {
   Payload,
   Formatter,
 } from "recharts/types/component/DefaultTooltipContent";
-import type { TimelinePoint } from "../_data/mock-timeline";
+import type { TimelinePoint } from "../../../lib/reflection/types";
 
 type IdentityShiftTimelineProps = {
   points: TimelinePoint[];
@@ -49,6 +50,7 @@ function ShiftDot(
   props: ShiftDotProps & { cx?: number; cy?: number; payload?: TimelinePoint },
 ) {
   const { cx, cy, payload, onSelectShift, selectedIsoDate } = props;
+  const router = useRouter();
 
   if (!cx || !cy || !payload) return null;
 
@@ -59,22 +61,47 @@ function ShiftDot(
   const fill = isShift ? "#FF9F1C" : "#CB997E";
   const stroke = isSelected ? "#FF9F1C" : "#FFBF69";
   const strokeWidth = isShift ? 3 : 0;
+  const hitRadius = isShift ? 14 : 12;
+
+  const handleClick = () => {
+    if (!payload.journalId) return;
+    onSelectShift?.(payload.isoDate);
+    router.push(`/journal/${payload.journalId}`);
+  };
 
   if (!isShift) {
-    return <circle cx={cx} cy={cy} r={size} fill={fill} opacity={0.7} />;
+    return (
+      <g style={{ cursor: "pointer" }}>
+        <circle
+          cx={cx}
+          cy={cy}
+          r={hitRadius}
+          fill="transparent"
+          onClick={handleClick}
+        />
+        <circle cx={cx} cy={cy} r={size} fill={fill} opacity={0.7} />
+      </g>
+    );
   }
 
   return (
-    <circle
-      cx={cx}
-      cy={cy}
-      r={size}
-      fill={fill}
-      stroke={stroke}
-      strokeWidth={strokeWidth}
-      style={{ cursor: "pointer" }}
-      onClick={() => onSelectShift?.(payload.isoDate)}
-    />
+    <g style={{ cursor: "pointer" }}>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={hitRadius}
+        fill="transparent"
+        onClick={handleClick}
+      />
+      <circle
+        cx={cx}
+        cy={cy}
+        r={size}
+        fill={fill}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+      />
+    </g>
   );
 }
 

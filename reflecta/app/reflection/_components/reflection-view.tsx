@@ -3,32 +3,113 @@
 import { useEffect, useMemo, useState } from "react";
 import IdentityShiftTimeline from "./identity-shift-timeline";
 import MomentsThatMattered from "./moments-that-mattered";
+import { supabase } from "../../../lib/supabase-browser";
 import {
-  MOCK_TIMELINE,
+  formatDayLabel,
   formatMonthLabel,
-  getAvailableMonths,
-  getDefaultMonthKey,
   getMonthKey,
-  type TimelinePoint,
-} from "../_data/mock-timeline";
+} from "../../../lib/reflection/date-utils";
+import type { AnalysisEntry, TimelinePoint } from "../../../lib/reflection/types";
 
 function filterPointsByMonth(points: TimelinePoint[], monthKey: string) {
   return points.filter((point) => getMonthKey(point.isoDate) === monthKey);
 }
 
-export default function ReflectionView() {
-  const availableMonths = useMemo(() => getAvailableMonths(MOCK_TIMELINE), []);
-  const [selectedMonthKey, setSelectedMonthKey] = useState(() =>
-    getDefaultMonthKey(MOCK_TIMELINE),
+function getAvailableMonths(entries: AnalysisEntry[]) {
+  const monthKeys = Array.from(
+    new Set(entries.map((entry) => getMonthKey(entry.entryDate))),
   );
+  return monthKeys.sort((a, b) => (a < b ? 1 : -1));
+}
+
+function getDefaultMonthKey(entries: AnalysisEntry[], now = new Date()) {
+  const currentKey = `${now.getFullYear()}-${String(
+    now.getMonth() + 1,
+  ).padStart(2, "0")}`;
+  const available = getAvailableMonths(entries);
+  if (available.includes(currentKey)) return currentKey;
+  return available[0];
+}
+
+function mapAnalysisToTimeline(entries: AnalysisEntry[]): TimelinePoint[] {
+  return entries.map((entry) => {
+    const kind =
+      entry.delta !== null && entry.delta !== undefined
+        ? entry.delta >= 0
+          ? "positive"
+          : "negative"
+        : undefined;
+
+    return {
+      journalId: entry.journalId,
+      isoDate: entry.entryDate,
+      date: formatDayLabel(entry.entryDate),
+      stability: entry.mhf,
+      isShift: entry.isCoreMemory,
+      label: entry.coreLabel ?? undefined,
+      kind,
+      delta: entry.delta,
+    };
+  });
+}
+
+export default function ReflectionView() {
+  const [analysisEntries, setAnalysisEntries] = useState<AnalysisEntry[]>([]);
+  const [selectedMonthKey, setSelectedMonthKey] = useState<string | null>(null);
   const [selectedShiftIsoDate, setSelectedShiftIsoDate] = useState<
     string | null
   >(null);
 
-  const monthPoints = useMemo(
-    () => filterPointsByMonth(MOCK_TIMELINE, selectedMonthKey),
-    [selectedMonthKey],
+  useEffect(() => {
+    let isMounted = true;
+    const loadEntries = async () => {
+      if (!supabase) return;
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData.user;
+      if (!user || !isMounted) return;
+
+      const { data, error } = await supabase
+        .from("journal_analysis")
+        .select("journal_id, entry_date, mhf, delta, is_core_memory, core_label")
+        .eq("user_id", user.id)
+        .order("entry_date", { ascending: true });
+
+      if (error || !data || !isMounted) return;
+
+      const mapped: AnalysisEntry[] = data.map((row) => ({
+        journalId: row.journal_id,
+        entryDate: row.entry_date,
+        mhf: row.mhf,
+        delta: row.delta,
+        isCoreMemory: row.is_core_memory,
+        coreLabel: row.core_label,
+      }));
+
+      setAnalysisEntries(mapped);
+    };
+
+    loadEntries();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!analysisEntries.length) return;
+    const defaultKey = getDefaultMonthKey(analysisEntries);
+    setSelectedMonthKey((current) => current ?? defaultKey);
+  }, [analysisEntries]);
+
+  const availableMonths = useMemo(
+    () => getAvailableMonths(analysisEntries),
+    [analysisEntries],
   );
+
+  const monthPoints = useMemo(() => {
+    if (!selectedMonthKey) return [];
+    const points = mapAnalysisToTimeline(analysisEntries);
+    return filterPointsByMonth(points, selectedMonthKey);
+  }, [analysisEntries, selectedMonthKey]);
 
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
@@ -96,7 +177,7 @@ export default function ReflectionView() {
           <label className="text-sm text-[#CB997E]">
             <span className="sr-only">Select month</span>
             <select
-              value={selectedMonthKey}
+              value={selectedMonthKey ?? ""}
               onChange={(event) => setSelectedMonthKey(event.target.value)}
               className="w-full min-w-[220px] rounded-xl border border-[#CB997E]/30 bg-white/80 px-3 py-2 text-sm text-[#CB997E] outline-none transition focus:border-[#FF9F1C] focus:ring-2 focus:ring-[#FF9F1C]/30"
             >
