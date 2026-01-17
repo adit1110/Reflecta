@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Crimson_Pro } from "next/font/google";
 import "./globals.css";
-import { Crimson_Pro } from "next/font/google";
+
 
 
 const crimson = Crimson_Pro({
