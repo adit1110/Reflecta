@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { PenLine, TrendingUp, Lock, ArrowRight, Sparkles } from 'lucide-react';
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
+  const [currentYear, setCurrentYear] = useState(2026);
 
   useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -22,24 +25,43 @@ export default function Home() {
         }}
       />
 
+      {/* Decorative circles */}
+      <div className="fixed top-20 right-20 w-96 h-96 bg-[#FFBF69]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="fixed bottom-20 left-20 w-80 h-80 bg-[#FF9F1C]/10 rounded-full blur-3xl pointer-events-none" />
+
       {/* Navigation */}
-      <nav className="relative z-10 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-        <div className="text-2xl font-light tracking-tight text-[#CB997E]">
-          Reflecta
+      <nav className="relative z-10 flex items-center justify-between px-6 md:px-12 py-8 max-w-7xl mx-auto">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-6 h-6 text-[#FF9F1C]" strokeWidth={1.5} />
+          <span className="text-2xl font-light tracking-tight text-[#CB997E]">
+            Reflecta
+          </span>
         </div>
-        <button className="px-6 py-2 text-sm font-medium text-[#CB997E] border border-[#CB997E] rounded-full hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300">
+        <button className="px-6 py-2.5 text-sm font-medium text-[#CB997E] border border-[#CB997E]/40 rounded-full hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300 hover:border-[#CB997E]">
           Sign In
         </button>
       </nav>
 
       {/* Hero Section */}
-      <main className="relative z-10 max-w-6xl mx-auto px-8 pt-24 pb-32">
+      <main className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 pt-16 md:pt-32 pb-32">
         {/* Main headline */}
-        <div className="space-y-8 mb-20">
-          <h1 className="text-7xl md:text-8xl font-light leading-[0.95] tracking-tight text-[#CB997E] max-w-4xl">
+        <div className="space-y-10 mb-24">
+          <div className="inline-block">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white/40 backdrop-blur-sm rounded-full border border-[#FF9F1C]/30 mb-8">
+              <div className="w-2 h-2 bg-[#FF9F1C] rounded-full animate-pulse" />
+              <span className="text-sm font-medium text-[#CB997E]">AI-Powered Mental Health Timeline</span>
+            </div>
+          </div>
+          
+          <h1 className="text-6xl md:text-8xl lg:text-9xl font-light leading-[0.95] tracking-tight text-[#CB997E] max-w-5xl">
             Your emotional
             <br />
-            <span className="italic font-light text-[#FF9F1C]">identity</span>
+            <span className="italic font-light text-[#FF9F1C] relative">
+              identity
+              <svg className="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 400 12" fill="none">
+                <path d="M2 10C80 3 320 3 398 10" stroke="#FF9F1C" strokeWidth="3" strokeLinecap="round" opacity="0.4"/>
+              </svg>
+            </span>
             <br />
             evolves daily
           </h1>
@@ -51,108 +73,91 @@ export default function Home() {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-32">
-          <button className="group px-8 py-4 bg-[#FF9F1C] text-white rounded-full text-lg font-medium hover:bg-[#FFBF69] transition-all duration-300 hover:shadow-xl hover:scale-105">
+        <div className="flex flex-col sm:flex-row gap-4 mb-40">
+          <button className="group px-8 py-5 bg-[#FF9F1C] text-white rounded-full text-lg font-medium hover:bg-[#FFBF69] transition-all duration-300 hover:shadow-2xl hover:scale-105 flex items-center justify-center gap-2">
             Start Writing Today
-            <span className="inline-block ml-2 group-hover:translate-x-1 transition-transform duration-300">→</span>
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" strokeWidth={2} />
           </button>
-          <button className="px-8 py-4 text-[#CB997E] border border-[#CB997E] rounded-full text-lg font-medium hover:bg-[#CB997E]/10 transition-all duration-300">
+          <button className="px-8 py-5 text-[#CB997E] border border-[#CB997E]/40 rounded-full text-lg font-medium hover:bg-[#CB997E]/10 hover:border-[#CB997E] transition-all duration-300">
             How It Works
           </button>
         </div>
 
-        {/* Key Features - Minimalist Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-32">
-          <div className="group p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/40 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1">
-            <div className="w-12 h-12 mb-6 rounded-full bg-[#FF9F1C]/20 flex items-center justify-center text-2xl">
-              ✍️
-            </div>
-            <h3 className="text-2xl font-light text-[#CB997E] mb-3">
-              Write Freely
-            </h3>
-            <p className="text-[#CB997E]/70 font-light leading-relaxed">
-              One daily entry. No pressure. Just you and your thoughts in a calm, private space.
-            </p>
-          </div>
-
-          <div className="group p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/40 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1">
-            <div className="w-12 h-12 mb-6 rounded-full bg-[#FFBF69]/20 flex items-center justify-center text-2xl">
-              📊
-            </div>
-            <h3 className="text-2xl font-light text-[#CB997E] mb-3">
-              See Patterns
-            </h3>
-            <p className="text-[#CB997E]/70 font-light leading-relaxed">
-              AI extracts emotional signals and creates your personal mental health timeline.
-            </p>
-          </div>
-
-          <div className="group p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/40 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1">
-            <div className="w-12 h-12 mb-6 rounded-full bg-[#CB997E]/20 flex items-center justify-center text-2xl">
-              🔒
-            </div>
-            <h3 className="text-2xl font-light text-[#CB997E] mb-3">
-              Stay Private
-            </h3>
-            <p className="text-[#CB997E]/70 font-light leading-relaxed">
-              Your data stays yours. Delete anytime. No diagnosis, just awareness.
-            </p>
-          </div>
-        </div>
-
-        {/* Visual Timeline Concept */}
-        <div className="relative">
-          <div className="text-center mb-12">
-            <h2 className="text-5xl font-light text-[#CB997E] mb-4">
-              Identity over time
-            </h2>
-            <p className="text-xl text-[#CB997E]/70 font-light">
-              Not a static snapshot. A living story.
-            </p>
-          </div>
-
-          {/* Timeline visualization */}
-          <div className="relative h-64 bg-white/30 backdrop-blur-sm rounded-3xl border border-[#CB997E]/20 p-8 overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex items-end gap-2 h-32">
-                {[45, 52, 48, 65, 58, 72, 68, 75, 70, 82, 78, 85, 80, 72, 68].map((height, i) => (
-                  <div
-                    key={i}
-                    className="w-8 bg-gradient-to-t from-[#FF9F1C] to-[#FFBF69] rounded-t-lg transition-all duration-500 hover:scale-110"
-                    style={{
-                      height: `${height}%`,
-                      opacity: 0.7 + (i * 0.02),
-                      animationDelay: `${i * 0.1}s`
-                    }}
-                  />
-                ))}
+        {/* Key Features - Enhanced Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-40">
+          <div className="group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#FF9F1C]/10 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity duration-500" />
+            <div className="relative">
+              <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#FF9F1C]/20 to-[#FFBF69]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <PenLine className="w-7 h-7 text-[#FF9F1C]" strokeWidth={1.5} />
               </div>
+              <h3 className="text-2xl font-light text-[#CB997E] mb-4">
+                Write Freely
+              </h3>
+              <p className="text-[#CB997E]/70 font-light leading-relaxed">
+                One daily entry. No pressure. Just you and your thoughts in a calm, private space.
+              </p>
+            </div>
+          </div>
+
+          <div className="group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#FFBF69]/10 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity duration-500" />
+            <div className="relative">
+              <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#FFBF69]/20 to-[#FF9F1C]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <TrendingUp className="w-7 h-7 text-[#FFBF69]" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-2xl font-light text-[#CB997E] mb-4">
+                See Patterns
+              </h3>
+              <p className="text-[#CB997E]/70 font-light leading-relaxed">
+                AI extracts emotional signals and creates your personal mental health timeline.
+              </p>
+            </div>
+          </div>
+
+          <div className="group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#CB997E]/10 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity duration-500" />
+            <div className="relative">
+              <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#CB997E]/20 to-[#FF9F1C]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Lock className="w-7 h-7 text-[#CB997E]" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-2xl font-light text-[#CB997E] mb-4">
+                Stay Private
+              </h3>
+              <p className="text-[#CB997E]/70 font-light leading-relaxed">
+                Your data stays yours. Delete anytime. No diagnosis, just awareness.
+              </p>
             </div>
           </div>
         </div>
 
         {/* Bottom CTA */}
-        <div className="mt-32 text-center">
-          <p className="text-lg text-[#CB997E]/60 font-light mb-6 italic">
-            People may not talk — but they will write.
-          </p>
-          <button className="px-10 py-5 bg-[#CB997E] text-white rounded-full text-lg font-medium hover:bg-[#FF9F1C] transition-all duration-300 hover:shadow-xl hover:scale-105">
-            Begin Your Journey
-          </button>
+        <div className="text-center">
+          <div className="inline-block mb-8 px-6 py-3 bg-white/40 backdrop-blur-sm rounded-full border border-[#CB997E]/20">
+            <p className="text-lg text-[#CB997E]/80 font-light italic">
+              People may not talk — but they will write.
+            </p>
+          </div>
+          <div>
+            <button className="group px-12 py-6 bg-[#CB997E] text-white rounded-full text-lg font-medium hover:bg-[#FF9F1C] transition-all duration-300 hover:shadow-2xl hover:scale-105 inline-flex items-center gap-3">
+              Begin Your Journey
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" strokeWidth={2} />
+            </button>
+          </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-[#CB997E]/20 mt-32">
-        <div className="max-w-7xl mx-auto px-8 py-12">
+      <footer className="relative z-10 border-t border-[#CB997E]/20 bg-white/20 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-sm text-[#CB997E]/60 font-light">
-              © 2025 Reflecta. Your data, your control.
+              © {currentYear} Reflecta. Your data, your control.
             </div>
             <div className="flex gap-8 text-sm text-[#CB997E]/60 font-light">
-              <a href="#" className="hover:text-[#FF9F1C] transition-colors">Privacy</a>
-              <a href="#" className="hover:text-[#FF9F1C] transition-colors">Ethics</a>
-              <a href="#" className="hover:text-[#FF9F1C] transition-colors">Contact</a>
+              <a href="#" className="hover:text-[#FF9F1C] transition-colors duration-300">Privacy</a>
+              <a href="#" className="hover:text-[#FF9F1C] transition-colors duration-300">Ethics</a>
+              <a href="#" className="hover:text-[#FF9F1C] transition-colors duration-300">Contact</a>
             </div>
           </div>
         </div>
