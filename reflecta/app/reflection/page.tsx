@@ -16,7 +16,7 @@ export default function ReflectionPage() {
           href="/"
           className="flex items-center gap-2 text-[#CB997E] text-sm font-bold hover:text-[#FF9F1C] transition-colors group"
         >
-          <Home className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <Home className="w-4 h-4 transition-colors" />
           Home
         </Link>
       </header>
