@@ -131,44 +131,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Visual Timeline Concept */}
-        <div className="relative mb-40">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-6xl font-light text-[#CB997E] mb-6">
-              Identity over time
-            </h2>
-            <p className="text-xl text-[#CB997E]/70 font-light">
-              Not a static snapshot. A living story.
-            </p>
-          </div>
-
-          {/* Enhanced Timeline visualization */}
-          <div className="relative h-80 bg-white/40 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 p-12 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-t from-[#FFE8D6]/50 to-transparent" />
-            <div className="relative h-full flex items-end justify-center gap-3">
-              {[45, 52, 48, 65, 58, 72, 68, 75, 70, 82, 78, 85, 80, 72, 68].map((height, i) => (
-                <div
-                  key={i}
-                  className="group relative w-10 bg-gradient-to-t from-[#FF9F1C] to-[#FFBF69] rounded-t-xl transition-all duration-500 hover:from-[#FFBF69] hover:to-[#FF9F1C] cursor-pointer"
-                  style={{
-                    height: `${height}%`,
-                    opacity: 0.6 + (i * 0.027),
-                    animationDelay: `${i * 0.05}s`,
-                    boxShadow: '0 -4px 12px rgba(255, 159, 28, 0.2)'
-                  }}
-                >
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[#CB997E] text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                    Day {i + 1}
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            {/* Timeline axis */}
-            <div className="absolute bottom-8 left-12 right-12 h-px bg-[#CB997E]/20" />
-          </div>
-        </div>
-
         {/* Bottom CTA */}
         <div className="text-center">
           <div className="inline-block mb-8 px-6 py-3 bg-white/40 backdrop-blur-sm rounded-full border border-[#CB997E]/20">
