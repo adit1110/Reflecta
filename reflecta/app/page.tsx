@@ -80,10 +80,10 @@ export default function Home() {
 
         {/* CTA - Animated from left */}
         <div className={`flex flex-col sm:flex-row gap-4 mb-40 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
-          <button className="group px-8 py-5 bg-[#FF9F1C] text-white rounded-full text-lg font-medium hover:bg-[#FFBF69] transition-all duration-300 hover:shadow-2xl hover:scale-105 flex items-center justify-center gap-2">
+          <Link href="/write" className="group px-8 py-5 bg-[#FF9F1C] text-white rounded-full text-lg font-medium hover:bg-[#FFBF69] transition-all duration-300 hover:shadow-2xl hover:scale-105 flex items-center justify-center gap-2">
             Start Writing Today
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" strokeWidth={2} />
-          </button>
+          </Link>
           <button className="px-8 py-5 text-[#CB997E] border border-[#CB997E]/40 rounded-full text-lg font-medium hover:bg-[#CB997E]/10 hover:border-[#CB997E] transition-all duration-300">
             How It Works
           </button>
@@ -145,10 +145,10 @@ export default function Home() {
             </p>
           </div>
           <div>
-            <button className="group px-12 py-6 bg-[#CB997E] text-white rounded-full text-lg font-medium hover:bg-[#FF9F1C] transition-all duration-300 hover:shadow-2xl hover:scale-105 inline-flex items-center gap-3">
+            <Link href="/write" className="group px-12 py-6 bg-[#CB997E] text-white rounded-full text-lg font-medium hover:bg-[#FF9F1C] transition-all duration-300 hover:shadow-2xl hover:scale-105 inline-flex items-center gap-3">
               Begin Your Journey
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" strokeWidth={2} />
-            </button>
+            </Link>
           </div>
         </div>
       </main>
