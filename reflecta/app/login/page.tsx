@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "../../lib/supabase-browser";
 
 export default function LoginPage() {
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -74,7 +76,8 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-[#CB997E]/40 bg-white focus:outline-none focus:ring-2 focus:ring-[#FF9F1C]"
+              className="w-full px-4 py-3 rounded-lg border border-[#CB997E]/40 bg-white text-[#CB997E] placeholder:text-[#CB997E]/50 focus:outline-none focus:ring-2 focus:ring-[#FF9F1C]"
+              placeholder="Enter your email"
             />
           </div>
 
@@ -82,24 +85,39 @@ export default function LoginPage() {
             <label className="block text-sm font-medium text-[#CB997E] mb-1">
               Password
             </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-[#CB997E]/40 bg-white focus:outline-none focus:ring-2 focus:ring-[#FF9F1C]"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="w-full px-4 py-3 pr-12 rounded-lg border border-[#CB997E]/40 bg-white text-[#CB997E] placeholder:text-[#CB997E]/50 focus:outline-none focus:ring-2 focus:ring-[#FF9F1C]"
+                placeholder="Enter your password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#CB997E]/60 hover:text-[#CB997E] transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 rounded-lg bg-[#FF9F1C] text-white font-medium hover:bg-[#FFBF69] transition-all duration-300 hover:shadow-lg"
+            className="w-full py-3 rounded-lg bg-[#FF9F1C] text-white font-medium hover:bg-[#FFBF69] transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Logging in..." : "Log in"}
           </button>
           {errorMessage ? (
-            <p className="text-sm text-[#CB997E]">{errorMessage}</p>
+            <p className="text-sm text-red-500 text-center">{errorMessage}</p>
           ) : null}
         </form>
 
