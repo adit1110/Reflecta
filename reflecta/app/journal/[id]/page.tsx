@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { Home, ArrowLeft } from "lucide-react";
 import { supabase } from "../../../lib/supabase-browser";
 import { formatFullDate } from "../../../lib/reflection/date-utils";
 
@@ -35,12 +36,12 @@ function ShiftBadge({
 
   const styles =
     kind === "positive"
-      ? "bg-[#FFBF69]/70 text-neutral-900"
-      : "bg-[#CB997E]/45 text-neutral-900";
+      ? "bg-[#FFBF69]/70 text-[#CB997E]"
+      : "bg-[#CB997E]/45 text-white";
 
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs ${styles}`}
+      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${styles}`}
     >
       {label}
     </span>
@@ -49,26 +50,43 @@ function ShiftBadge({
 
 function NotFoundState() {
   return (
-    <main className="min-h-screen bg-[#FFE8D6]">
-      <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-10 sm:px-6">
+    <main className="min-h-screen bg-gradient-to-br from-[#FFE8D6] via-[#FFF1E6] to-[#FFE8D6]">
+      {/* Decorative background elements */}
+      <div className="fixed top-40 right-20 w-72 h-72 bg-[#FFBF69]/20 rounded-full blur-3xl pointer-events-none animate-pulse" />
+      <div className="fixed bottom-40 left-20 w-96 h-96 bg-[#FF9F1C]/10 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Top bar */}
+      <header className="relative z-10 flex items-center justify-between px-6 md:px-12 py-6 border-b border-[#CB997E]/10 bg-white/30 backdrop-blur-sm">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-[#CB997E] text-sm font-bold hover:text-[#FF9F1C] transition-colors group"
+        >
+          <Home className="w-4 h-4 transition-colors" />
+          Home
+        </Link>
+      </header>
+
+      <div className="relative z-10 mx-auto flex max-w-2xl flex-col gap-6 px-6 py-16">
         <Link
           href="/reflection"
-          className="text-sm font-medium text-neutral-700 hover:text-neutral-900"
+          className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-[#CB997E] border border-[#CB997E]/40 rounded-full hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300 w-fit"
         >
-          &larr; Back to Reflection
+          <ArrowLeft className="w-4 h-4" />
+          Back to Reflection
         </Link>
-        <div className="rounded-2xl bg-white/70 p-6 shadow-sm ring-1 ring-black/5">
-          <h1 className="text-xl font-semibold text-neutral-900">
-            This entry does not exist.
+        <div className="rounded-3xl bg-white/70 backdrop-blur-md p-8 shadow-xl border border-[#CB997E]/20">
+          <h1 className="text-2xl font-light text-[#CB997E]">
+            Entry Not Found
           </h1>
-          <p className="mt-2 text-sm text-neutral-700">
-            The journal entry you are looking for is not available.
+          <p className="mt-4 text-base font-light text-[#CB997E]/80 leading-relaxed">
+            The journal entry you're looking for doesn't exist or has been removed.
           </p>
           <Link
             href="/reflection"
-            className="mt-4 inline-flex items-center rounded-full bg-[#FF9F1C] px-4 py-2 text-sm font-medium text-neutral-900 shadow-sm transition hover:bg-[#FFBF69]"
+            className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#FF9F1C] text-white font-medium hover:bg-[#FFBF69] transition-all shadow-lg hover:shadow-xl hover:scale-105"
           >
-            &larr; Back to Reflection
+            <ArrowLeft className="w-4 h-4" />
+            Back to Reflection
           </Link>
         </div>
       </div>
@@ -152,53 +170,113 @@ export default function JournalDetailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#FFE8D6]">
-      <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10 sm:px-6">
+    <main className="min-h-screen bg-gradient-to-br from-[#FFE8D6] via-[#FFF1E6] to-[#FFE8D6]">
+      {/* Decorative background elements */}
+      <div className="fixed top-40 right-20 w-72 h-72 bg-[#FFBF69]/20 rounded-full blur-3xl pointer-events-none animate-pulse" />
+      <div className="fixed bottom-40 left-20 w-96 h-96 bg-[#FF9F1C]/10 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Top bar */}
+      <header className="relative z-10 flex items-center justify-between px-6 md:px-12 py-6 border-b border-[#CB997E]/10 bg-white/30 backdrop-blur-sm">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-[#CB997E] text-sm font-bold hover:text-[#FF9F1C] transition-colors group"
+        >
+          <Home className="w-4 h-4 transition-colors" />
+          Home
+        </Link>
+      </header>
+
+      {/* Main content */}
+      <div className="relative z-10 mx-auto flex max-w-4xl flex-col gap-6 px-6 py-12 md:py-16">
         <Link
           href="/reflection"
-          className="text-sm font-medium text-neutral-700 hover:text-neutral-900"
+          className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-[#CB997E] border border-[#CB997E]/40 rounded-full hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300 w-fit"
         >
-          &larr; Back to Reflection
+          <ArrowLeft className="w-4 h-4" />
+          Back to Reflection
         </Link>
 
-        <header className="space-y-2">
-          <h1 className="text-2xl font-semibold text-neutral-900">
-            {displayDate ?? "Journal Entry"}
-          </h1>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-neutral-600">
-            {state.analysis?.mhf !== undefined ? (
-              <span>
+        {/* Date banner */}
+        <div className="text-center">
+          <div className="inline-block px-6 py-3 bg-white/50 backdrop-blur-sm rounded-full border border-[#CB997E]/20">
+            <p className="text-base md:text-lg text-[#CB997E] font-bold tracking-wide">
+              {displayDate ?? "Journal Entry"}
+            </p>
+          </div>
+        </div>
+
+        {/* Stats badges */}
+        {(state.analysis?.mhf !== undefined || 
+          typeof state.analysis?.delta === "number" || 
+          state.analysis?.is_core_memory) && (
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {state.analysis?.mhf !== undefined && (
+              <span className="inline-flex items-center rounded-full px-4 py-2 text-sm font-light bg-white/50 backdrop-blur-sm border border-[#CB997E]/20 text-[#CB997E]">
                 Stability{" "}
-                <span className="font-medium text-neutral-900">
+                <span className="ml-1 font-medium">
                   {state.analysis.mhf}
                 </span>
               </span>
-            ) : null}
-            {typeof state.analysis?.delta === "number" ? (
-              <span>
+            )}
+            {typeof state.analysis?.delta === "number" && (
+              <span className="inline-flex items-center rounded-full px-4 py-2 text-sm font-light bg-white/50 backdrop-blur-sm border border-[#CB997E]/20 text-[#CB997E]">
                 Delta{" "}
-                <span className="font-medium text-neutral-900">
+                <span className="ml-1 font-medium">
                   {state.analysis.delta > 0 ? "+" : ""}
                   {state.analysis.delta}
                 </span>
               </span>
-            ) : null}
-            {state.analysis?.is_core_memory ? (
+            )}
+            {state.analysis?.is_core_memory && (
               <ShiftBadge
                 kind={shiftKind}
                 label={state.analysis.core_label ?? "Moment That Mattered"}
               />
-            ) : null}
+            )}
           </div>
-        </header>
+        )}
 
-        <section className="rounded-2xl bg-white/70 p-6 shadow-sm ring-1 ring-black/5">
-          <div className="mt-1 space-y-3 text-sm text-neutral-800">
-            {state.entry.content.split("\n\n").map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
+        {/* Notebook card with spiral binding */}
+        <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden">
+          {/* Spiral binding holes */}
+          <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#FFE8D6] to-transparent flex flex-col justify-start gap-8 pt-8 items-center z-10">
+            {[...Array(12)].map((_, i) => (
+              <div key={i} className="relative">
+                {/* Hole shadow */}
+                <div className="w-6 h-6 rounded-full bg-[#CB997E]/30 blur-sm absolute inset-0"></div>
+                {/* Hole */}
+                <div className="w-6 h-6 rounded-full border-2 border-[#CB997E]/40 bg-[#FFE8D6] relative"></div>
+                {/* Inner shadow */}
+                <div className="w-3 h-3 rounded-full bg-[#CB997E]/20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+              </div>
             ))}
           </div>
-        </section>
+
+          {/* Notebook paper with lines */}
+          <div className="relative pl-16 pr-8">
+            {/* Red margin line */}
+            <div className="absolute left-20 top-0 bottom-0 w-[2px] bg-[#FF9F1C]/30"></div>
+
+            <div
+              className="w-full min-h-[50vh] p-8 md:p-12 pl-8 text-lg md:text-xl text-[#CB997E] leading-[2.5rem] relative z-20 font-light"
+              style={{
+                backgroundImage: `repeating-linear-gradient(
+                  transparent,
+                  transparent 2.4rem,
+                  #CB997E15 2.4rem,
+                  #CB997E15 2.5rem
+                )`,
+                backgroundAttachment: 'local',
+              }}
+            >
+              {state.entry.content.split("\n\n").map((paragraph, idx) => (
+                <p key={idx} className="mb-6 last:mb-0">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );
