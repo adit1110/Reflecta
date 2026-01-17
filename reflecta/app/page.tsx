@@ -77,16 +77,16 @@ export default function Home() {
           </span>
         </div>
         {userLabel ? (
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-[#CB997E]">
+          <div className="flex items-center gap-4">
+            <span className="text-lg font-medium text-[#CB997E]">
               {userLabel}
             </span>
             <button
               type="button"
               onClick={handleLogout}
-              className="text-xs text-[#CB997E]/70 hover:text-[#CB997E]"
+              className="px-6 py-2.5 text-sm font-medium text-[#CB997E] border border-[#CB997E]/40 rounded-full hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300 hover:border-[#CB997E]"
             >
-              Log out
+              Log Out
             </button>
           </div>
         ) : (
