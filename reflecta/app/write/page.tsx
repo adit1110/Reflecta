@@ -15,7 +15,9 @@ export default function WritePage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [hasJustSaved, setHasJustSaved] = useState(false);
+  const [showReflectionPrompt, setShowReflectionPrompt] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const promptTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Check if speech recognition is supported
@@ -62,6 +64,10 @@ export default function WritePage() {
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
+      }
+      // Cleanup timeout
+      if (promptTimeoutRef.current) {
+        clearTimeout(promptTimeoutRef.current);
       }
     };
   }, []);
@@ -174,6 +180,17 @@ export default function WritePage() {
       setText(trimmed);
       setIsSubmitted(true);
       setStatusMessage("Submitted.");
+      
+      // Show reflection prompt popup
+      setShowReflectionPrompt(true);
+      
+      // Auto-dismiss after 10 seconds
+      if (promptTimeoutRef.current) {
+        clearTimeout(promptTimeoutRef.current);
+      }
+      promptTimeoutRef.current = setTimeout(() => {
+        setShowReflectionPrompt(false);
+      }, 10000);
     } catch {
       setStatusMessage("Something went wrong. Please try again.");
     } finally {
@@ -199,6 +216,13 @@ export default function WritePage() {
     } else {
       recognitionRef.current.start();
       setIsRecording(true);
+    }
+  };
+
+  const closeReflectionPrompt = () => {
+    setShowReflectionPrompt(false);
+    if (promptTimeoutRef.current) {
+      clearTimeout(promptTimeoutRef.current);
     }
   };
 
@@ -367,6 +391,58 @@ export default function WritePage() {
           </div>
         </div>
       </main>
+
+      {/* Reflection Prompt Popup */}
+      {showReflectionPrompt && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 animate-in slide-in-from-bottom-4 duration-300">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#FF9F1C]/30 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-[#FF9F1C]/20 to-[#FFBF69]/20 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-[#FF9F1C]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-[#CB997E]">
+                      Entry Saved!
+                    </h3>
+                    <p className="text-sm text-[#CB997E]/70 font-light mt-0.5">
+                      See how today fits into your journey
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={closeReflectionPrompt}
+                  className="flex-shrink-0 w-8 h-8 rounded-full hover:bg-[#CB997E]/10 flex items-center justify-center text-[#CB997E]/60 hover:text-[#CB997E] transition-colors"
+                  aria-label="Close"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <Link
+                href="/reflection"
+                onClick={closeReflectionPrompt}
+                className="block w-full px-6 py-3 rounded-full bg-[#FF9F1C] text-white font-medium hover:bg-[#FFBF69] transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] text-center"
+              >
+                View Reflection Timeline
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
