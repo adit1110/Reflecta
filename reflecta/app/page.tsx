@@ -81,6 +81,18 @@ export default function Home() {
             <span className="text-lg font-medium text-[#CB997E]">
               {userLabel}
             </span>
+            <Link
+              href="/write"
+              className="px-6 py-2.5 text-sm font-medium text-[#FF9F1C] border border-[#FF9F1C]/40 rounded-full hover:bg-[#FF9F1C] hover:text-white transition-all duration-300 hover:border-[#FF9F1C]"
+            >
+              Write
+            </Link>
+            <Link
+              href="/reflection"
+              className="px-6 py-2.5 text-sm font-medium text-[#FF9F1C] border border-[#FF9F1C]/40 rounded-full hover:bg-[#FF9F1C] hover:text-white transition-all duration-300 hover:border-[#FF9F1C]"
+            >
+              Reflection
+            </Link>
             <button
               type="button"
               onClick={handleLogout}

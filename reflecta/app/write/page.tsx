@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Mic, MicOff, Save, Home } from "lucide-react";
+import { Mic, MicOff, Save, Home, Sparkles } from "lucide-react";
 import { supabase } from "../../lib/supabase-browser";
 
 export default function WritePage() {
@@ -13,6 +13,7 @@ export default function WritePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [entryId, setEntryId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [hasJustSaved, setHasJustSaved] = useState(false);
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
@@ -161,6 +162,7 @@ export default function WritePage() {
         setEntryId(data?.id ?? null);
       }
       setStatusMessage("Saved.");
+      setHasJustSaved(true);
     } catch {
       setStatusMessage("Couldn't save. Please try again.");
     } finally {
@@ -250,7 +252,10 @@ export default function WritePage() {
 
               <textarea
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={(e) => {
+                  setText(e.target.value);
+                  if (hasJustSaved) setHasJustSaved(false);
+                }}
                 placeholder="Write freely or click the microphone to speak your thoughts..."
                 className="w-full min-h-[65vh] resize-none p-8 md:p-12 pl-8 text-lg md:text-xl text-[#CB997E] placeholder:text-[#CB997E]/40 bg-transparent focus:outline-none leading-[2.5rem] relative z-20"
                 style={{
@@ -305,6 +310,18 @@ export default function WritePage() {
                   <p className="text-sm text-[#CB997E] italic">
                     {statusMessage}
                   </p>
+                </div>
+              )}
+
+              {hasJustSaved && (
+                <div className="mt-4 text-center">
+                  <Link
+                    href="/reflection"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#CB997E] text-white font-medium hover:bg-[#FF9F1C] transition-all shadow-lg hover:shadow-xl hover:scale-105 group"
+                  >
+                    <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                    View Your Reflection
+                  </Link>
                 </div>
               )}
 
