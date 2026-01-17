@@ -33,7 +33,7 @@ type MergedJournal = {
 
 type DateRange = { from: string; to: string };
 
-const GEMINI_PROMPT = `You are not here to fix the user.
+export const GEMINI_PROMPT = `You are not here to fix the user.
 You are here to help them see themselves clearly.
 Identity is not static.
  It moves.
@@ -123,16 +123,12 @@ const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
-const GEMINI_MODEL =
-  process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !GEMINI_API_KEY) {
-  throw new Error(
-    "Missing required environment variables. Expect SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL), SUPABASE_SERVICE_ROLE_KEY, and GEMINI_API_KEY."
-  );
-}
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const supabase =
+  SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+    : null;
 
 function computeDateRange(): DateRange {
   const now = new Date();
@@ -145,6 +141,12 @@ function computeDateRange(): DateRange {
 }
 
 async function fetchJournals(range: DateRange): Promise<JournalRow[]> {
+  if (!supabase) {
+    throw new Error(
+      "Missing Supabase configuration. Expect SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY."
+    );
+  }
+
   const { data, error } = await supabase
     .from("journals")
     .select("id,user_id,entry_date,content,created_at")
@@ -161,6 +163,12 @@ async function fetchJournals(range: DateRange): Promise<JournalRow[]> {
 async function fetchJournalAnalysis(
   range: DateRange
 ): Promise<JournalAnalysisRow[]> {
+  if (!supabase) {
+    throw new Error(
+      "Missing Supabase configuration. Expect SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY."
+    );
+  }
+
   const { data, error } = await supabase
     .from("journal_analysis")
     .select(
@@ -205,6 +213,10 @@ function serializePayload(payload: unknown): string {
 }
 
 async function sendToGemini(serializedPayload: string): Promise<string> {
+  if (!GEMINI_API_KEY) {
+    throw new Error("Missing GEMINI_API_KEY.");
+  }
+
   const url =
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
       GEMINI_MODEL
@@ -256,4 +268,11 @@ async function main() {
   }
 }
 
-main();
+const isDirectRun =
+  typeof process !== "undefined" &&
+  Array.isArray(process.argv) &&
+  process.argv[1]?.includes("gemini-journal-export.ts");
+
+if (isDirectRun) {
+  main();
+}
