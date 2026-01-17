@@ -84,7 +84,7 @@ export default function IdentityShiftTimeline({
   onSelectShift,
 }: IdentityShiftTimelineProps) {
   return (
-    <div className="h-[280px] w-full sm:h-[340px]">
+    <div className="h-[280px] min-h-[280px] w-full sm:h-[340px] sm:min-h-[340px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={points}
