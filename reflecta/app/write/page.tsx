@@ -95,14 +95,14 @@ export default function WritePage() {
       <header className="relative z-10 flex items-center justify-between px-6 md:px-12 py-6 border-b border-[#CB997E]/10 bg-white/30 backdrop-blur-sm">
         <Link
           href="/"
-          className="flex items-center gap-2 text-[#CB997E] text-sm font-medium hover:text-[#FF9F1C] transition-colors group"
+          className="flex items-center gap-2 text-[#CB997E] text-sm font-bold hover:text-[#FF9F1C] transition-colors group"
         >
           <Home className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Home
         </Link>
 
         <div className="flex items-center gap-4">
-          <span className="text-sm text-[#CB997E]/70 font-light">
+          <span className="text-sm text-[#CB997E] font-bold">
             {text.length} characters
           </span>
         </div>
@@ -114,7 +114,7 @@ export default function WritePage() {
           {/* Date banner */}
           <div className="mb-8 text-center">
             <div className="inline-block px-6 py-3 bg-white/50 backdrop-blur-sm rounded-full border border-[#CB997E]/20">
-              <p className="text-base md:text-lg text-[#CB997E] font-light tracking-wide">
+              <p className="text-base md:text-lg text-[#CB997E] font-bold tracking-wide">
                 {currentDate}
               </p>
             </div>
@@ -126,7 +126,7 @@ export default function WritePage() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Write freely or click the microphone to speak your thoughts..."
-              className="w-full min-h-[65vh] resize-none p-8 md:p-12 text-lg md:text-xl text-[#3A2D28] placeholder:text-[#CB997E]/50 bg-transparent focus:outline-none leading-relaxed"
+              className="w-full min-h-[65vh] resize-none p-8 md:p-12 text-lg md:text-xl text-[#CB997E] placeholder:text-[#CB997E]/50 bg-transparent focus:outline-none leading-relaxed"
               style={{ fontFamily: 'inherit' }}
             />
 
