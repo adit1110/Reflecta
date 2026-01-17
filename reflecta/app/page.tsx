@@ -89,12 +89,12 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Key Features - Enhanced Cards with Staggered Animation from left */}
+        {/* Key Features - Cards with NO hover effects */}
         <div className="grid md:grid-cols-3 gap-6 mb-40">
-          <div className={`group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`} style={{ transitionDelay: '900ms' }}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#FF9F1C]/10 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity duration-500" />
+          {/* Card 1 - No hover */}
+          <div className={`relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 shadow-xl transition-all duration-1000 delay-[900ms] ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
             <div className="relative">
-              <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#FF9F1C]/20 to-[#FFBF69]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#FF9F1C]/20 to-[#FFBF69]/20 flex items-center justify-center">
                 <PenLine className="w-7 h-7 text-[#FF9F1C]" strokeWidth={1.5} />
               </div>
               <h3 className="text-2xl font-light text-[#CB997E] mb-4">
@@ -106,10 +106,10 @@ export default function Home() {
             </div>
           </div>
 
-          <div className={`group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`} style={{ transitionDelay: '1050ms' }}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#FFBF69]/10 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity duration-500" />
+          {/* Card 2 - No hover */}
+          <div className={`relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 shadow-xl transition-all duration-1000 delay-[1050ms] ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
             <div className="relative">
-              <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#FFBF69]/20 to-[#FF9F1C]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#FFBF69]/20 to-[#FF9F1C]/20 flex items-center justify-center">
                 <TrendingUp className="w-7 h-7 text-[#FFBF69]" strokeWidth={1.5} />
               </div>
               <h3 className="text-2xl font-light text-[#CB997E] mb-4">
@@ -121,10 +121,10 @@ export default function Home() {
             </div>
           </div>
 
-          <div className={`group relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 hover:border-[#FF9F1C]/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`} style={{ transitionDelay: '1200ms' }}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#CB997E]/10 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity duration-500" />
+          {/* Card 3 - No hover */}
+          <div className={`relative p-10 bg-white/50 backdrop-blur-md rounded-3xl border border-[#CB997E]/20 shadow-xl transition-all duration-1000 delay-[1200ms] ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
             <div className="relative">
-              <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#CB997E]/20 to-[#FF9F1C]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div className="w-14 h-14 mb-8 rounded-2xl bg-gradient-to-br from-[#CB997E]/20 to-[#FF9F1C]/20 flex items-center justify-center">
                 <Lock className="w-7 h-7 text-[#CB997E]" strokeWidth={1.5} />
               </div>
               <h3 className="text-2xl font-light text-[#CB997E] mb-4">
@@ -145,7 +145,7 @@ export default function Home() {
             </p>
           </div>
           <div>
-            <Link href="/write" className="group px-12 py-6 bg-[#CB997E] text-white rounded-full text-lg font-medium hover:bg-[#FF9F1C] transition-all duration-300 hover:shadow-2xl hover:scale-105 inline-flex items-center gap-3">
+            <Link href="/write" className="group px-12 py-6 bg-[#FF9F1C] text-white rounded-full text-lg font-medium hover:bg-[#FFBF69] transition-all duration-300 hover:shadow-2xl hover:scale-105 inline-flex items-center gap-3">
               Begin Your Journey
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" strokeWidth={2} />
             </Link>
