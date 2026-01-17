@@ -12,6 +12,7 @@ export default function WritePage() {
   const [isSupported, setIsSupported] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [entryId, setEntryId] = useState<string | null>(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
 
@@ -89,6 +90,8 @@ export default function WritePage() {
     if (data?.content) {
       setEntryId(data.id);
       setText(data.content);
+      setIsSubmitted(true);
+      setStatusMessage("Submitted. This entry is read-only.");
     }
   };
 
@@ -126,6 +129,10 @@ export default function WritePage() {
       setStatusMessage("Please log in to save your journal.");
       return;
     }
+    if (isSubmitted || entryId) {
+      setStatusMessage("Submitted. This entry is read-only.");
+      return;
+    }
     const trimmed = text.trim();
     if (!trimmed) {
       setStatusMessage("Write something before saving.");
@@ -135,40 +142,49 @@ export default function WritePage() {
     setStatusMessage(null);
     const today = getLocalISODate();
     try {
-      if (entryId) {
-        const { error } = await supabase
-          .from("journals")
-          .update({ content: trimmed })
-          .eq("id", entryId);
-        if (error) {
-          setStatusMessage("Couldn't save. Please try again.");
-          return;
-        }
-      } else {
-        const { data, error } = await supabase
-          .from("journals")
-          .insert({
-            user_id: userId,
-            entry_date: today,
-            content: trimmed,
-          })
-          .select("id")
-          .single();
-        if (error) {
-          setStatusMessage("Couldn't save. Please try again.");
-          return;
-        }
-        setEntryId(data?.id ?? null);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) {
+        setStatusMessage("Please log in to save your journal.");
+        return;
       }
-      setStatusMessage("Saved.");
+
+      const response = await fetch("/api/journals/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ content: trimmed, entry_date: today }),
+      });
+
+      if (response.status === 409) {
+        setStatusMessage("You've already written today's entry.");
+        return;
+      }
+
+      if (!response.ok) {
+        setStatusMessage("Something went wrong. Please try again.");
+        return;
+      }
+
+      const payload = (await response.json()) as { journal_id?: string };
+      setEntryId(payload.journal_id ?? null);
+      setText(trimmed);
+      setIsSubmitted(true);
+      setStatusMessage("Submitted.");
     } catch {
-      setStatusMessage("Couldn't save. Please try again.");
+      setStatusMessage("Something went wrong. Please try again.");
     } finally {
       setIsSaving(false);
     }
   };
 
   const toggleRecording = () => {
+    if (isSubmitted) {
+      setStatusMessage("Submitted. This entry is read-only.");
+      return;
+    }
     if (!isSupported) {
       setStatusMessage(
         "Speech recognition is not supported in this browser. Try Chrome, Edge, or Safari.",
@@ -251,6 +267,7 @@ export default function WritePage() {
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
+                readOnly={isSubmitted}
                 placeholder="Write freely or click the microphone to speak your thoughts..."
                 className="w-full min-h-[65vh] resize-none p-8 md:p-12 pl-8 text-lg md:text-xl text-[#CB997E] placeholder:text-[#CB997E]/40 bg-transparent focus:outline-none leading-[2.5rem] relative z-20"
                 style={{
@@ -292,11 +309,11 @@ export default function WritePage() {
 
                 <button
                   onClick={handleSave}
-                  disabled={!text.trim() || isSaving || !userId}
+                  disabled={!text.trim() || isSaving || !userId || isSubmitted}
                   className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#FF9F1C] text-white font-medium hover:bg-[#FFBF69] transition-all shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 group"
                 >
                   <Save className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                  {isSaving ? "Saving..." : "Save Entry"}
+                  {isSubmitted ? "Submitted" : isSaving ? "Submitting..." : "Submit"}
                 </button>
               </div>
 
