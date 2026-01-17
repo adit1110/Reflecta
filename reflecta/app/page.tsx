@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PenLine, TrendingUp, Lock, ArrowRight, Sparkles } from 'lucide-react';
+import Link from "next/link";
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
@@ -37,9 +38,9 @@ export default function Home() {
             Reflecta
           </span>
         </div>
-        <button className="px-6 py-2.5 text-sm font-medium text-[#CB997E] border border-[#CB997E]/40 rounded-full hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300 hover:border-[#CB997E]">
+        <Link href="/login" className="px-6 py-2.5 text-sm font-medium text-[#CB997E] border border-[#CB997E]/40 rounded-full hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300 hover:border-[#CB997E]">
           Sign In
-        </button>
+        </Link>
       </nav>
 
       {/* Hero Section */}
