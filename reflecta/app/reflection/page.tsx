@@ -1,4 +1,4 @@
-// src/app/reflection/page.tsx
+// app/reflection/page.tsx
 import ReflectionView from "./_components/reflection-view";
 import Link from "next/link";
 import { Home } from "lucide-react";
