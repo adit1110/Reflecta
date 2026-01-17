@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Reflecta
 
-## Getting Started
+Reflecta is a privacy-first identity reflection app that helps people see how their emotional identity shifts over time.
 
-First, run the development server:
+Users write a daily journal entry. Behind the scenes, AI extracts emotional signals, an in-house algorithm turns those signals into a daily Mental Health / Identity Score (MLH), and the result is visualized as a calm timeline of change.
 
-```bash
+Reflecta does not diagnose, treat, or give medical advice.
+It is a mirror — not a therapist.
+
+The Idea (Pitch)
+
+Most people won’t talk about their mental state — but they will write.
+
+Reflecta turns private journaling into:
+
+A daily identity score
+
+A visual timeline of emotional shifts
+
+Gentle self-reflection written in the user’s own tone
+
+This helps users recognize patterns and moments that mattered — without judgment, labels, or clinical framing.
+
+How It Works
+
+Write → Analyze → Score → Visualize → Reflect
+
+User writes a journal entry
+
+Google Gemini extracts emotional signals (sentiment, stress, energy, etc.)
+
+A custom algorithm calculates a daily MLH score (0–100)
+
+Scores are plotted over time
+
+Significant changes are highlighted as Identity Shifts
+
+AI generates a short self-reflective message (not advice)
+
+Tech Stack
+
+Next.js (App Router)
+
+Tailwind CSS
+
+Supabase (Postgres + Auth)
+
+Google Gemini API
+
+Recharts
+
+Vercel
+
+How to Run Locally
+1. Clone the repo
+git clone https://github.com/adit1110/Reflecta.git
+cd Reflecta/reflecta
+
+2. Install dependencies
+npm install
+
+3. Add environment variables
+
+Create a .env.local file:
+
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
+GEMINI_API_KEY=your_gemini_key
+
+4. Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+App will run at:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+http://localhost:3000
 
-## Learn More
+Ethics & Safety
 
-To learn more about Next.js, take a look at the following resources:
+No diagnosis
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+No therapy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+No medical claims
 
-## Deploy on Vercel
+Explicit AI consent
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+User-controlled data
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Full deletion supported
+
+One-Line Summary
+
+Reflecta helps people understand how their emotional identity changes over time by turning private journaling into a calm, reflective timeline.
