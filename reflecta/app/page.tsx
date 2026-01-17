@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { PenLine, TrendingUp, Lock, ArrowRight, Sparkles } from 'lucide-react';
 import Link from "next/link";
+import { supabase } from "../lib/supabase-browser";
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
   const [currentYear, setCurrentYear] = useState(2026);
   const [isVisible, setIsVisible] = useState(false);
+  const [userLabel, setUserLabel] = useState<string | null>(null);
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
@@ -16,6 +18,40 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadUser = async () => {
+      if (!supabase) return;
+      const { data } = await supabase.auth.getUser();
+      const user = data.user;
+      if (!isMounted) return;
+      if (user) {
+        const fallback = user.email ? user.email.split("@")[0] : "Account";
+        const label =
+          (user.user_metadata?.full_name as string | undefined) ||
+          (user.user_metadata?.name as string | undefined) ||
+          fallback;
+        setUserLabel(label);
+      } else {
+        setUserLabel(null);
+      }
+    };
+    loadUser();
+    const { data: authListener } = supabase?.auth.onAuthStateChange(() => {
+      loadUser();
+    }) ?? { data: { subscription: null } };
+    return () => {
+      isMounted = false;
+      authListener?.subscription?.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    setUserLabel(null);
+  };
 
   return (
     <div className="min-h-screen bg-[#FFE8D6] overflow-hidden">
@@ -40,9 +76,27 @@ export default function Home() {
             Reflecta
           </span>
         </div>
-        <Link href="/login" className="px-6 py-2.5 text-sm font-medium text-[#CB997E] border border-[#CB997E]/40 rounded-full hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300 hover:border-[#CB997E]">
-          Sign In
-        </Link>
+        {userLabel ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-[#CB997E]">
+              {userLabel}
+            </span>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="text-xs text-[#CB997E]/70 hover:text-[#CB997E]"
+            >
+              Log out
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="px-6 py-2.5 text-sm font-medium text-[#CB997E] border border-[#CB997E]/40 rounded-full hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300 hover:border-[#CB997E]"
+          >
+            Sign In
+          </Link>
+        )}
       </nav>
 
       {/* Hero Section */}
