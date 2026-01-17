@@ -1,36 +1,80 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Volume2, VolumeX, Save, Home } from "lucide-react";
+import { Mic, MicOff, Save, Home } from "lucide-react";
 
 export default function WritePage() {
   const [text, setText] = useState("");
   const [saved, setSaved] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isSupported, setIsSupported] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    // Check if speech recognition is supported
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        setIsSupported(true);
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = true;
+        recognitionRef.current.lang = 'en-US';
+
+        recognitionRef.current.onresult = (event: any) => {
+          let interimTranscript = '';
+          let finalTranscript = '';
+
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript + ' ';
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+
+          if (finalTranscript) {
+            setText((prev) => prev + finalTranscript);
+          }
+        };
+
+        recognitionRef.current.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          setIsRecording(false);
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsRecording(false);
+        };
+      }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
 
   const handleSave = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleTextToSpeech = () => {
-    if ('speechSynthesis' in window) {
-      if (isSpeaking) {
-        // Stop speaking
-        window.speechSynthesis.cancel();
-        setIsSpeaking(false);
-      } else {
-        // Start speaking
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.9;
-        utterance.pitch = 1;
-        utterance.onend = () => setIsSpeaking(false);
-        window.speechSynthesis.speak(utterance);
-        setIsSpeaking(true);
-      }
+  const toggleRecording = () => {
+    if (!isSupported) {
+      alert('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
+      return;
+    }
+
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
     } else {
-      alert('Text-to-speech is not supported in your browser.');
+      recognitionRef.current.start();
+      setIsRecording(true);
     }
   };
 
@@ -81,7 +125,7 @@ export default function WritePage() {
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Write freely. No pressure. No rules. Just your thoughts..."
+              placeholder="Write freely or click the microphone to speak your thoughts..."
               className="w-full min-h-[65vh] resize-none p-8 md:p-12 text-lg md:text-xl text-[#3A2D28] placeholder:text-[#CB997E]/50 bg-transparent focus:outline-none leading-relaxed"
               style={{ fontFamily: 'inherit' }}
             />
@@ -90,19 +134,22 @@ export default function WritePage() {
             <div className="px-8 md:px-12 py-6 bg-gradient-to-r from-[#FFF5EC] to-[#FFE8D6] border-t border-[#CB997E]/10">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <button
-                  onClick={handleTextToSpeech}
-                  disabled={!text.trim()}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#CB997E]/40 text-[#CB997E] font-medium hover:bg-[#CB997E]/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed group"
+                  onClick={toggleRecording}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all group ${
+                    isRecording
+                      ? 'bg-red-500 text-white shadow-lg animate-pulse'
+                      : 'border border-[#CB997E]/40 text-[#CB997E] hover:bg-[#CB997E]/10'
+                  }`}
                 >
-                  {isSpeaking ? (
+                  {isRecording ? (
                     <>
-                      <VolumeX className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                      Stop Reading
+                      <MicOff className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      Stop Recording
                     </>
                   ) : (
                     <>
-                      <Volume2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                      Read Aloud
+                      <Mic className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      Voice Input
                     </>
                   )}
                 </button>
@@ -124,13 +171,24 @@ export default function WritePage() {
                   </p>
                 </div>
               )}
+
+              {isRecording && (
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-red-500 italic flex items-center justify-center gap-2">
+                    <span className="inline-block w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+                    Listening... Speak now
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Helper text */}
           <div className="mt-8 text-center">
             <p className="text-sm text-[#CB997E]/60 font-light italic">
-              Your words are private and secure. Write what's on your mind.
+              {isSupported 
+                ? "Your words are private and secure. Write or speak what's on your mind."
+                : "Your words are private and secure. Write what's on your mind."}
             </p>
           </div>
         </div>
