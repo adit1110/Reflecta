@@ -5,6 +5,11 @@ type TalkResult = {
   id: string;
   result_url?: string;
   status?: string;
+  error?: {
+    kind?: string;
+    description?: string;
+  };
+  message?: string;
 };
 
 type GenerateVideoOptions = {
@@ -89,7 +94,8 @@ async function getTalk(talkId: string) {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch D-ID talk.");
+    const detail = await response.text();
+    throw new Error(`Failed to fetch D-ID talk: ${detail}`);
   }
 
   return (await response.json()) as TalkResult;
@@ -104,7 +110,12 @@ async function pollForResult(talkId: string) {
     const talk = await getTalk(talkId);
     if (talk.result_url) return talk.result_url;
     if (talk.status && talk.status.toLowerCase() === "error") {
-      throw new Error("D-ID talk failed.");
+      const detail =
+        talk.error?.description ||
+        talk.error?.kind ||
+        talk.message ||
+        "D-ID talk failed.";
+      throw new Error(`D-ID talk failed: ${detail}`);
     }
 
     attempt += 1;
