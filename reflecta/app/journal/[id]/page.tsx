@@ -125,6 +125,8 @@ export default function JournalDetailPage() {
     aiSummary: null,
   });
   const [isReady, setIsReady] = useState(false);
+  const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
+  const [videoError, setVideoError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -353,6 +355,74 @@ export default function JournalDetailPage() {
             </div>
           </div>
         </div>
+
+        {(state.summary?.summary || state.summary?.video_url) && (
+          <section className="rounded-3xl bg-white/70 backdrop-blur-md p-6 shadow-2xl border border-[#CB997E]/20">
+            <h2 className="text-lg font-light text-[#CB997E]">AI Summary</h2>
+            {state.summary?.summary && (
+              <p className="mt-3 text-base text-[#CB997E]/80 font-light leading-relaxed">
+                {state.summary.summary}
+              </p>
+            )}
+            {state.summary?.video_url ? (
+              <div className="mt-5">
+                <video
+                  src={state.summary.video_url}
+                  controls
+                  className="w-full rounded-2xl border border-[#CB997E]/20 shadow-lg"
+                />
+              </div>
+            ) : (
+              <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <p className="text-sm text-[#CB997E]/70 font-light">
+                  Video is generating...
+                </p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const journalId = Array.isArray(params?.id)
+                      ? params?.id[0]
+                      : params?.id;
+                    if (!journalId) return;
+                    setIsGeneratingVideo(true);
+                    setVideoError(null);
+                    try {
+                      const res = await fetch("/api/video/generate", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ journal_id: journalId }),
+                      });
+                      const data = await res.json();
+                      if (data.video_url) {
+                        setState((prev) => ({
+                          ...prev,
+                          summary: prev.summary
+                            ? { ...prev.summary, video_url: data.video_url }
+                            : { summary: null, video_url: data.video_url },
+                        }));
+                      } else {
+                        setVideoError("Video generation failed.");
+                      }
+                    } catch {
+                      setVideoError("Video generation failed.");
+                    } finally {
+                      setIsGeneratingVideo(false);
+                    }
+                  }}
+                  className="px-4 py-2 rounded-full border border-[#CB997E]/40 text-[#CB997E] text-sm font-medium hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300 disabled:opacity-50"
+                  disabled={isGeneratingVideo}
+                >
+                  {isGeneratingVideo ? "Generating..." : "Generate video"}
+                </button>
+                {videoError && (
+                  <span className="text-xs text-[#CB997E]/70 font-light">
+                    {videoError}
+                  </span>
+                )}
+              </div>
+            )}
+          </section>
+        )}
       </div>
     </main>
   );
