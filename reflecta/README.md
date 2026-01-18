@@ -18,8 +18,17 @@ cd reflecta
 
 You need to get environment variables from 
 * Supabase
+* OAuth
 * Gemini
 * D-ID
+
+Create .env.local at the same level as package.json
+
+```bash
+touch .env.local
+```
+
+Then add all of the keys that we will be using in this project
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=supabase_url
