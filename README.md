@@ -43,7 +43,6 @@ This helps users recognize patterns and moments that mattered — **without judg
 - **Supabase** (Postgres + Auth)  
 - **Google Gemini API**  
 - **Recharts**  
-- **Vercel**
 
 ---
 
