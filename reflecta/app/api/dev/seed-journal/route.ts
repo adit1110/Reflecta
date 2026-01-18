@@ -12,6 +12,8 @@ type SeedPayload = {
   content?: string;
 };
 
+type SeedRequest = SeedPayload | { items: SeedPayload[] };
+
 function isValidIsoDate(value: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
@@ -20,6 +22,18 @@ function isValidUuid(value: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     value,
   );
+}
+
+function normalizePayload(body: SeedRequest): SeedPayload[] {
+  if (
+    body &&
+    typeof body === "object" &&
+    "items" in body &&
+    Array.isArray((body as { items?: unknown }).items)
+  ) {
+    return (body as { items: SeedPayload[] }).items;
+  }
+  return [body as SeedPayload];
 }
 
 export async function POST(request: Request) {
@@ -38,120 +52,145 @@ export async function POST(request: Request) {
     );
   }
 
-  const body = (await request.json()) as SeedPayload;
-  const userId = body.user_id?.trim() ?? "";
-  const entryDate = body.entry_date?.trim() ?? "";
-  const content = body.content?.trim() ?? "";
-
-  if (!userId || !isValidUuid(userId)) {
+  const body = (await request.json()) as SeedRequest;
+  const items = normalizePayload(body);
+  if (!items.length) {
     return NextResponse.json(
-      { error: "Invalid user_id." },
-      { status: 400 },
-    );
-  }
-
-  if (!entryDate || !isValidIsoDate(entryDate)) {
-    return NextResponse.json(
-      { error: "Invalid entry_date." },
-      { status: 400 },
-    );
-  }
-
-  if (!content) {
-    return NextResponse.json(
-      { error: "Content is required." },
+      { error: "Missing seed items." },
       { status: 400 },
     );
   }
 
   const supabase = createClient(url, serviceRoleKey);
 
-  const { data: journal, error: insertError } = await supabase
-    .from("journals")
-    .insert({
-      user_id: userId,
-      entry_date: entryDate,
-      content,
-    })
-    .select("id")
-    .single();
+  const results = [];
 
-  if (insertError) {
-    if (insertError.code === "23505") {
-      return NextResponse.json(
-        { error: "You've already written today's entry." },
-        { status: 409 },
-      );
+  for (const item of items) {
+    const userId = item.user_id?.trim() ?? "";
+    const entryDate = item.entry_date?.trim() ?? "";
+    const content = item.content?.trim() ?? "";
+
+    if (!userId || !isValidUuid(userId)) {
+      results.push({
+        ok: false,
+        entry_date: entryDate,
+        error: "Invalid user_id.",
+      });
+      continue;
     }
-    return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
-      { status: 500 },
-    );
-  }
 
-  const factors = extractFactorScores(content);
-  const mhfResult = computeMhfFromFactors(factors);
+    if (!entryDate || !isValidIsoDate(entryDate)) {
+      results.push({
+        ok: false,
+        entry_date: entryDate,
+        error: "Invalid entry_date.",
+      });
+      continue;
+    }
 
-  const { data: previous } = await supabase
-    .from("journal_analysis")
-    .select("mhf, entry_date")
-    .eq("user_id", userId)
-    .lt("entry_date", entryDate)
-    .order("entry_date", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    if (!content) {
+      results.push({
+        ok: false,
+        entry_date: entryDate,
+        error: "Content is required.",
+      });
+      continue;
+    }
 
-  const core = detectCoreMemory(mhfResult.mhf, previous?.mhf);
+    const { data: journal, error: insertError } = await supabase
+      .from("journals")
+      .insert({
+        user_id: userId,
+        entry_date: entryDate,
+        content,
+      })
+      .select("id")
+      .single();
 
-  const { error: analysisError } = await supabase
-    .from("journal_analysis")
-    .insert({
+    if (insertError || !journal) {
+      results.push({
+        ok: false,
+        entry_date: entryDate,
+        error:
+          insertError?.code === "23505"
+            ? "You've already written today's entry."
+            : "Something went wrong. Please try again.",
+      });
+      continue;
+    }
+
+    const factors = extractFactorScores(content);
+    const mhfResult = computeMhfFromFactors(factors);
+
+    const { data: previous } = await supabase
+      .from("journal_analysis")
+      .select("mhf, entry_date")
+      .eq("user_id", userId)
+      .lt("entry_date", entryDate)
+      .order("entry_date", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const core = detectCoreMemory(mhfResult.mhf, previous?.mhf);
+
+    const { error: analysisError } = await supabase
+      .from("journal_analysis")
+      .insert({
+        journal_id: journal.id,
+        user_id: userId,
+        entry_date: entryDate,
+        mhf: mhfResult.mhf,
+        delta: core.delta,
+        is_core_memory: core.is_core_memory,
+        core_label: core.core_label,
+        stress: factors.stress,
+        instability: factors.instability,
+        intensity: factors.intensity,
+        fatigue: factors.fatigue,
+        neg_sentiment: factors.neg_sentiment,
+        algo_version: "v1",
+      });
+
+    if (analysisError) {
+      results.push({
+        ok: false,
+        entry_date: entryDate,
+        error: "Something went wrong. Please try again.",
+      });
+      continue;
+    }
+
+    let aiSummary: string | null = null;
+    let aiSummaryError: string | null = null;
+
+    try {
+      aiSummary = await generateAndPersistJournalSummary(
+        supabase,
+        userId,
+        journal.id,
+        entryDate,
+      );
+    } catch {
+      aiSummaryError = "Summary generation failed.";
+    }
+
+    results.push({
+      ok: true,
       journal_id: journal.id,
-      user_id: userId,
       entry_date: entryDate,
       mhf: mhfResult.mhf,
       delta: core.delta,
       is_core_memory: core.is_core_memory,
       core_label: core.core_label,
-      stress: factors.stress,
-      instability: factors.instability,
-      intensity: factors.intensity,
-      fatigue: factors.fatigue,
-      neg_sentiment: factors.neg_sentiment,
-      algo_version: "v1",
+      summary: aiSummary,
+      summary_error: aiSummaryError,
     });
-
-  if (analysisError) {
-    return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
-      { status: 500 },
-    );
-  }
-
-  let aiSummary: string | null = null;
-  let aiSummaryError: string | null = null;
-
-  try {
-    aiSummary = await generateAndPersistJournalSummary(
-      supabase,
-      userId,
-      journal.id,
-      entryDate,
-    );
-  } catch {
-    aiSummaryError = "Summary generation failed.";
   }
 
   return NextResponse.json({
     ok: true,
-    journal_id: journal.id,
-    entry_date: entryDate,
-    mhf: mhfResult.mhf,
-    delta: core.delta,
-    is_core_memory: core.is_core_memory,
-    core_label: core.core_label,
-    summary: aiSummary,
-    summary_error: aiSummaryError,
+    count: results.length,
+    results,
   });
 }
 
