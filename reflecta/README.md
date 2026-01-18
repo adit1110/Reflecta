@@ -15,7 +15,7 @@ git clone https://github.com/adit1110/Reflecta.git
 cd reflecta
 ```
 
-## Set up environmetn variables
+## Set up environment variables
 
 You need to get environment variables from 
 * Supabase
