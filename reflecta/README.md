@@ -9,7 +9,7 @@
 
 ## Getting started
 
-```
+```bash
 git clone https://github.com/adit1110/Reflecta.git
 cd reflecta
 ```
@@ -21,7 +21,7 @@ You need to get environment variables from
 * Gemini
 * D-ID
 
-```
+```bash
 NEXT_PUBLIC_SUPABASE_URL=supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=supabase-key
 # Dev-only seed endpoint protection
@@ -35,12 +35,12 @@ DID_VOICE_ID=d-id_voice(ex. en-US-JennyNeural)
 
 ## Get everything installed
 
-```
+```bash
 npm install
 ```
 
 ## Start
 
-```
+```bash
 npm run dev
 ```
