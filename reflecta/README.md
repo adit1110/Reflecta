@@ -42,7 +42,7 @@ DID_SOURCE_URL=d-id_url
 DID_VOICE_ID=d-id_voice(ex. en-US-JennyNeural)
 ```
 
-## Install dependencies
+## Install Dependencies
 
 ```bash
 npm install
