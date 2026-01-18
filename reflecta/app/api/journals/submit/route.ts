@@ -5,6 +5,7 @@ import { extractFactorScores } from "../../../../lib/nlp/factor-extractor";
 import { computeMhfFromFactors } from "../../../../lib/nlp/mhf-score";
 import { detectCoreMemory } from "../../../../lib/nlp/core-memory";
 import { GEMINI_PROMPT } from "../../../../scripts/gemini-journal-export";
+import { generateJournalVideo } from "../../../../lib/video/did-video";
 
 type SubmitPayload = {
   content?: string;
@@ -304,6 +305,8 @@ export async function POST(request: Request) {
 
   let aiSummary: string | null = null;
   let aiSummaryError: string | null = null;
+  let videoUrl: string | null = null;
+  let videoError: string | null = null;
 
   try {
     aiSummary = await generateAndPersistJournalSummary(
@@ -316,6 +319,20 @@ export async function POST(request: Request) {
     aiSummaryError = "Summary generation failed.";
   }
 
+  if (aiSummary) {
+    try {
+      const result = await generateJournalVideo({
+        summary: aiSummary,
+        journalId: journal.id,
+        userId: user.id,
+      });
+      videoUrl = result.videoUrl;
+    } catch (error) {
+      console.error("Video generation failed:", error);
+      videoError = "Video generation failed.";
+    }
+  }
+
   return NextResponse.json({
     ok: true,
     journal_id: journal.id,
@@ -324,5 +341,7 @@ export async function POST(request: Request) {
     core_label: core.core_label,
     summary: aiSummary,
     summary_error: aiSummaryError,
+    video_url: videoUrl,
+    video_error: videoError,
   });
 }
