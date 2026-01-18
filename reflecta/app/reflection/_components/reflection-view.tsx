@@ -185,19 +185,19 @@ export default function ReflectionView() {
       <section className="rounded-3xl bg-white/60 backdrop-blur-md p-6 shadow-2xl border border-[#CB997E]/20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-light text-[#CB997E]">
+            <h2 className="text-xl font-light text-[#CB997E]">
               Month view
             </h2>
-            <p className="mt-1 text-sm text-[#CB997E]/70 font-light">
+            <p className="mt-1 text-base text-[#CB997E]/70 font-light">
               Choose a month to see the shifts that stood out.
             </p>
           </div>
-          <label className="text-sm text-[#CB997E]">
+          <label className="text-base text-[#CB997E]">
             <span className="sr-only">Select month</span>
             <select
               value={selectedMonthKey ?? ""}
               onChange={(event) => setSelectedMonthKey(event.target.value)}
-              className="w-full min-w-[220px] rounded-xl border border-[#CB997E]/30 bg-white/80 px-4 py-2.5 text-sm text-[#CB997E] font-light outline-none transition focus:border-[#FF9F1C] focus:ring-2 focus:ring-[#FF9F1C]/30"
+              className="w-full min-w-[220px] rounded-xl border border-[#CB997E]/30 bg-white/80 px-4 py-2.5 text-base text-[#CB997E] font-light outline-none transition focus:border-[#FF9F1C] focus:ring-2 focus:ring-[#FF9F1C]/30"
             >
               {availableMonths.map((monthKey) => (
                 <option key={monthKey} value={monthKey}>
@@ -213,10 +213,10 @@ export default function ReflectionView() {
           <section className="rounded-3xl bg-white/60 backdrop-blur-md p-6 shadow-2xl border border-[#CB997E]/20">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <p className="text-base font-medium text-[#CB997E]">
+                <p className="text-lg font-medium text-[#CB997E]">
                   {selectedPoint.date}
                 </p>
-                <p className="text-sm text-[#CB997E]/70 font-light mt-1">
+                <p className="text-base text-[#CB997E]/70 font-light mt-1">
                   {selectedPoint.label}
                 </p>
               </div>
@@ -234,10 +234,10 @@ export default function ReflectionView() {
 
 
       <section className="min-w-0 rounded-3xl bg-white/60 backdrop-blur-md p-6 shadow-2xl border border-[#CB997E]/20">
-        <h2 className="text-xl font-light text-[#CB997E]">
+        <h2 className="text-2xl font-light text-[#CB997E]">
           Identity Shift Timeline
         </h2>
-        <p className="mt-2 text-sm text-[#CB997E]/70 font-light">
+        <p className="mt-2 text-base text-[#CB997E]/70 font-light">
           Hover for details. Click a highlighted day to focus it.
         </p>
 
@@ -266,11 +266,11 @@ export default function ReflectionView() {
 
     {/* Error modal */}
     <div className="relative z-10 w-full max-w-md mx-4 rounded-3xl bg-white/90 backdrop-blur-md shadow-2xl border border-[#CB997E]/20 p-8 animate-in fade-in zoom-in duration-200">
-      <p className="text-xl font-light text-[#CB997E] text-center">
+      <p className="text-2xl font-light text-[#CB997E] text-center">
         Reflection video not available
       </p>
 
-      <p className="mt-4 text-base text-[#CB997E]/70 font-light text-center leading-relaxed">
+      <p className="mt-4 text-lg text-[#CB997E]/70 font-light text-center leading-relaxed">
         {videoError}
       </p>
 
@@ -298,12 +298,12 @@ export default function ReflectionView() {
         <section className="fixed inset-x-4 bottom-6 z-50 sm:right-6 sm:left-auto sm:w-[440px]">
           <div className="rounded-3xl bg-white/95 backdrop-blur-md shadow-2xl border border-[#CB997E]/20 overflow-hidden">
             <div className="p-5 border-b border-[#CB997E]/20 bg-gradient-to-r from-[#FFF5EC] to-[#FFE8D6]">
-              <p className="text-base font-medium text-[#CB997E]">
+              <p className="text-lg font-medium text-[#CB997E]">
                 Reflection Video
               </p>
 
               {videoNarrative && (
-                <p className="mt-2 text-sm text-[#CB997E]/70 font-light leading-relaxed">
+                <p className="mt-2 text-base text-[#CB997E]/70 font-light leading-relaxed">
                   {videoNarrative}
                 </p>
               )}
@@ -318,7 +318,7 @@ export default function ReflectionView() {
             <div className="p-4 bg-white/50 border-t border-[#CB997E]/10">
               <button
                 onClick={() => setVideoUrl(null)}
-                className="w-full px-4 py-2.5 rounded-full border border-[#CB997E]/40 text-[#CB997E] text-sm font-medium hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300"
+                className="w-full px-4 py-2.5 rounded-full border border-[#CB997E]/40 text-[#CB997E] text-base font-medium hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300"
               >
                 Close
               </button>

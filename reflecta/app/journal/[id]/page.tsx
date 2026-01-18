@@ -3,9 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Home, ArrowLeft, Sparkles } from "lucide-react";
+import { Home, ArrowLeft } from "lucide-react";
 import { supabase } from "../../../lib/supabase-browser";
-import { formatFullDate } from "../../../lib/reflection/date-utils";
 
 type JournalEntry = {
   id: string;
@@ -20,16 +19,27 @@ type JournalAnalysis = {
   core_label: string | null;
 };
 
-type AISummary = {
-  summary: string;
-  created_at: string;
+type JournalSummary = {
+  summary: string | null;
+  video_url: string | null;
 };
 
 type JournalState = {
   entry: JournalEntry | null;
   analysis: JournalAnalysis | null;
-  aiSummary: AISummary | null;
+  summary: JournalSummary | null;
 };
+
+// Inline date formatting function (since formatFullDate doesn't exist in date-utils)
+function formatFullDate(isoDate: string): string {
+  const date = new Date(`${isoDate}T00:00:00`);
+  return date.toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
 
 function ShiftBadge({
   kind,
@@ -100,29 +110,12 @@ function NotFoundState() {
   );
 }
 
-function NotebookSpiralBinding() {
-  return (
-    <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#FFE8D6] to-transparent flex flex-col justify-start gap-8 pt-8 items-center z-10">
-      {[...Array(12)].map((_, i) => (
-        <div key={i} className="relative">
-          {/* Hole shadow */}
-          <div className="w-6 h-6 rounded-full bg-[#CB997E]/30 blur-sm absolute inset-0"></div>
-          {/* Hole */}
-          <div className="w-6 h-6 rounded-full border-2 border-[#CB997E]/40 bg-[#FFE8D6] relative"></div>
-          {/* Inner shadow */}
-          <div className="w-3 h-3 rounded-full bg-[#CB997E]/20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function JournalDetailPage() {
   const params = useParams<{ id: string | string[] }>();
   const [state, setState] = useState<JournalState>({
     entry: null,
     analysis: null,
-    aiSummary: null,
+    summary: null,
   });
   const [isReady, setIsReady] = useState(false);
   const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
@@ -149,24 +142,21 @@ export default function JournalDetailPage() {
         return;
       }
 
-      // Fetch journal entry
       const { data: entry } = await supabase
         .from("journals")
         .select("id, entry_date, content")
         .eq("id", journalId)
         .maybeSingle();
 
-      // Fetch analysis
       const { data: analysis } = await supabase
         .from("journal_analysis")
         .select("mhf, delta, is_core_memory, core_label")
         .eq("journal_id", journalId)
         .maybeSingle();
 
-      // Fetch AI summary
-      const { data: aiSummary } = await supabase
+      const { data: summary } = await supabase
         .from("journal_ai_summary")
-        .select("summary, created_at")
+        .select("summary, video_url")
         .eq("journal_id", journalId)
         .maybeSingle();
 
@@ -174,7 +164,7 @@ export default function JournalDetailPage() {
       setState({
         entry: entry ?? null,
         analysis: analysis ?? null,
-        aiSummary: aiSummary ?? null,
+        summary: summary ?? null,
       });
       setIsReady(true);
     };
@@ -272,69 +262,27 @@ export default function JournalDetailPage() {
           </div>
         )}
 
-        {/* AI Summary - Notebook style */}
-        {state.aiSummary && (
-          <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden">
-            <NotebookSpiralBinding />
-
-            {/* Notebook paper with lines */}
-            <div className="relative pl-16 pr-8">
-              {/* Red margin line */}
-              <div className="absolute left-20 top-0 bottom-0 w-[2px] bg-[#FF9F1C]/30"></div>
-
-              {/* AI Summary Header */}
-              <div className="pt-8 px-8 md:px-12 pl-8 pb-4 border-b-2 border-[#FFBF69]/30">
-                <div className="flex items-center gap-3">
-                  <Sparkles className="w-5 h-5 text-[#FF9F1C]" />
-                  <h2 className="text-xl font-medium text-[#FF9F1C]">
-                    AI Summary
-                  </h2>
-                </div>
-                <p className="mt-2 text-sm text-[#CB997E]/70 font-light italic">
-                  An AI-generated reflection on your entry
-                </p>
-              </div>
-
-              {/* AI Summary Content */}
-              <div
-                className="w-full min-h-[20vh] p-8 md:p-12 pl-8 text-lg md:text-xl text-[#CB997E] leading-[2.5rem] relative z-20 font-light"
-                style={{
-                  backgroundImage: `repeating-linear-gradient(
-                    transparent,
-                    transparent 2.4rem,
-                    #CB997E15 2.4rem,
-                    #CB997E15 2.5rem
-                  )`,
-                  backgroundAttachment: 'local',
-                }}
-              >
-                {state.aiSummary.summary.split("\n\n").map((paragraph, idx) => (
-                  <p key={idx} className="mb-6 last:mb-0">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Original Journal Entry - Notebook style */}
+        {/* Notebook card with spiral binding */}
         <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden">
-          <NotebookSpiralBinding />
+          {/* Spiral binding holes */}
+          <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#FFE8D6] to-transparent flex flex-col justify-start gap-8 pt-8 items-center z-10">
+            {[...Array(12)].map((_, i) => (
+              <div key={i} className="relative">
+                {/* Hole shadow */}
+                <div className="w-6 h-6 rounded-full bg-[#CB997E]/30 blur-sm absolute inset-0"></div>
+                {/* Hole */}
+                <div className="w-6 h-6 rounded-full border-2 border-[#CB997E]/40 bg-[#FFE8D6] relative"></div>
+                {/* Inner shadow */}
+                <div className="w-3 h-3 rounded-full bg-[#CB997E]/20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+              </div>
+            ))}
+          </div>
 
           {/* Notebook paper with lines */}
           <div className="relative pl-16 pr-8">
             {/* Red margin line */}
             <div className="absolute left-20 top-0 bottom-0 w-[2px] bg-[#FF9F1C]/30"></div>
 
-            {/* Journal Entry Header */}
-            <div className="pt-8 px-8 md:px-12 pl-8 pb-4 border-b-2 border-[#CB997E]/30">
-              <h2 className="text-xl font-medium text-[#CB997E]">
-                Your Journal Entry
-              </h2>
-            </div>
-
-            {/* Journal Entry Content */}
             <div
               className="w-full min-h-[50vh] p-8 md:p-12 pl-8 text-lg md:text-xl text-[#CB997E] leading-[2.5rem] relative z-20 font-light"
               style={{
@@ -392,6 +340,13 @@ export default function JournalDetailPage() {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ journal_id: journalId }),
                       });
+                      
+                      // Handle auth errors
+                      if (res.status === 403 || res.status === 401) {
+                        setVideoError("Authentication error. Please refresh the page and log in again.");
+                        return;
+                      }
+                      
                       const data = await res.json();
                       if (data.video_url) {
                         setState((prev) => ({

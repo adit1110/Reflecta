@@ -96,21 +96,21 @@ function MomentCard({ moment, isSelected, onSelect }: MomentCardProps) {
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-base font-medium text-[#CB997E]">
+          <div className="text-lg font-medium text-[#CB997E]">
             {moment.date}
           </div>
-          <div className="mt-1.5 text-sm text-[#CB997E]/70 font-light">
+          <div className="mt-1.5 text-base text-[#CB997E]/70 font-light">
             {moment.label ?? "Moment That Mattered"}
           </div>
         </div>
 
         <div className="flex flex-col items-end gap-2">
           <span
-            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${badge.bg} ${badge.text}`}
+            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${badge.bg} ${badge.text}`}
           >
             {badge.label}
           </span>
-          <div className="text-xs text-[#CB997E]/70 font-light">
+          <div className="text-sm text-[#CB997E]/70 font-light">
             Stability:{" "}
             <span className="font-medium text-[#CB997E]">
               {moment.stability}
@@ -145,22 +145,22 @@ export default function MomentsThatMattered({
     <section className="mt-6">
       <div className="flex items-baseline justify-between gap-4 mb-6">
         <div>
-          <h3 className="text-xl font-light text-[#CB997E]">
+          <h3 className="text-2xl font-light text-[#CB997E]">
             Moments that mattered
           </h3>
-          <p className="mt-2 text-sm text-[#CB997E]/70 font-light">
+          <p className="mt-2 text-base text-[#CB997E]/70 font-light">
             Not every day is highlighted - just the shifts that stood out.
           </p>
         </div>
 
-        <div className="hidden text-sm text-[#CB997E]/70 font-light sm:block">
+        <div className="hidden text-base text-[#CB997E]/70 font-light sm:block">
           {totalCount} highlighted
         </div>
       </div>
 
       <div className="mt-4 grid gap-5 lg:grid-cols-2">
         <div className="space-y-4">
-          <div className="text-sm font-medium text-[#CB997E] tracking-wide">
+          <div className="text-base font-medium text-[#CB997E] tracking-wide">
             Positive Shifts
           </div>
           {positive.length ? (
@@ -173,14 +173,14 @@ export default function MomentsThatMattered({
               />
             ))
           ) : (
-            <div className="rounded-2xl bg-white/50 backdrop-blur-sm p-5 text-sm text-[#CB997E]/70 font-light border border-[#CB997E]/20">
+            <div className="rounded-2xl bg-white/50 backdrop-blur-sm p-5 text-base text-[#CB997E]/70 font-light border border-[#CB997E]/20">
               No positive shifts yet.
             </div>
           )}
         </div>
 
         <div className="space-y-4">
-          <div className="text-sm font-medium text-[#CB997E] tracking-wide">
+          <div className="text-base font-medium text-[#CB997E] tracking-wide">
             Heavier Days
           </div>
           {negative.length ? (
@@ -193,7 +193,7 @@ export default function MomentsThatMattered({
               />
             ))
           ) : (
-            <div className="rounded-2xl bg-white/50 backdrop-blur-sm p-5 text-sm text-[#CB997E]/70 font-light border border-[#CB997E]/20">
+            <div className="rounded-2xl bg-white/50 backdrop-blur-sm p-5 text-base text-[#CB997E]/70 font-light border border-[#CB997E]/20">
               No heavier shifts yet.
             </div>
           )}
