@@ -1,5 +1,6 @@
 # How to run
 
+
 ## Have installed
 
 * Git
@@ -33,7 +34,6 @@ Then add all of the keys that we will be using in this project
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=supabase-key
-# Dev-only seed endpoint protection
 SEED_SECRET=secret_seed
 SUPABASE_SERVICE_ROLE_KEY=supabase_server_role_key
 GEMINI_API_KEY=gemini_key
