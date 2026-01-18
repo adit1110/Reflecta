@@ -8,6 +8,11 @@ export type AnalysisEntry = {
   delta: number | null;
   isCoreMemory: boolean;
   coreLabel: string | null;
+  stress: number;
+  instability: number;
+  intensity: number;
+  fatigue: number;
+  negSentiment: number;
 };
 
 export type TimelinePoint = {
@@ -19,4 +24,9 @@ export type TimelinePoint = {
   label?: string;
   kind?: ShiftKind;
   delta?: number | null;
+  stress?: number;
+  instability?: number;
+  intensity?: number;
+  fatigue?: number;
+  negSentiment?: number;
 };

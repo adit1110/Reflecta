@@ -24,15 +24,44 @@ type MomentGroup = {
   negative: Moment[];
 };
 
+function scorePositive(point: TimelinePoint) {
+  const neg = point.negSentiment ?? 0;
+  const stress = point.stress ?? 0;
+  const fatigue = point.fatigue ?? 0;
+  const mhf = point.stability ?? 0;
+  return (
+    (1 - neg) * 0.6 +
+    (1 - stress) * 0.2 +
+    (1 - fatigue) * 0.2 +
+    (mhf / 100) * 0.2
+  );
+}
+
+function scoreHeavier(point: TimelinePoint) {
+  const neg = point.negSentiment ?? 0;
+  const stress = point.stress ?? 0;
+  const fatigue = point.fatigue ?? 0;
+  return neg * 0.6 + stress * 0.25 + fatigue * 0.15;
+}
+
 function getMoments(points: TimelinePoint[]): MomentGroup {
-  const moments = points
-    .filter((point) => point.isShift)
-    .map((point) => ({ ...point, id: point.journalId }))
-    .sort((a, b) => Math.abs(b.delta ?? 0) - Math.abs(a.delta ?? 0));
+  const base = points.map((point) => ({ ...point, id: point.journalId }));
+  const positive = [...base]
+    .sort((a, b) => scorePositive(b) - scorePositive(a))
+    .slice(0, 3)
+    .map((moment) => ({ ...moment, kind: "positive", label: "Positive Shift" }));
+
+  const positiveIds = new Set(positive.map((moment) => moment.id));
+
+  const negative = [...base]
+    .filter((moment) => !positiveIds.has(moment.id))
+    .sort((a, b) => scoreHeavier(b) - scoreHeavier(a))
+    .slice(0, 3)
+    .map((moment) => ({ ...moment, kind: "negative", label: "Heavier Day" }));
 
   return {
-    positive: moments.filter((moment) => moment.kind === "positive"),
-    negative: moments.filter((moment) => moment.kind === "negative"),
+    positive,
+    negative,
   };
 }
 

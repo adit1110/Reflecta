@@ -46,9 +46,20 @@ function mapAnalysisToTimeline(entries: AnalysisEntry[]): TimelinePoint[] {
       date: formatDayLabel(entry.entryDate),
       stability: entry.mhf,
       isShift: entry.isCoreMemory,
-      label: entry.coreLabel ?? undefined,
+      label:
+        entry.coreLabel ??
+        (kind === "positive"
+          ? "Positive Shift"
+          : kind === "negative"
+            ? "Heavier Day"
+            : undefined),
       kind,
       delta: entry.delta,
+      stress: entry.stress,
+      instability: entry.instability,
+      intensity: entry.intensity,
+      fatigue: entry.fatigue,
+      negSentiment: entry.negSentiment,
     };
   });
 }
@@ -70,7 +81,9 @@ export default function ReflectionView() {
 
       const { data, error } = await supabase
         .from("journal_analysis")
-        .select("journal_id, entry_date, mhf, delta, is_core_memory, core_label")
+        .select(
+          "journal_id, entry_date, mhf, delta, is_core_memory, core_label, stress, instability, intensity, fatigue, neg_sentiment",
+        )
         .eq("user_id", user.id)
         .order("entry_date", { ascending: true });
 
@@ -83,6 +96,11 @@ export default function ReflectionView() {
         delta: row.delta,
         isCoreMemory: row.is_core_memory,
         coreLabel: row.core_label,
+        stress: row.stress,
+        instability: row.instability,
+        intensity: row.intensity,
+        fatigue: row.fatigue,
+        negSentiment: row.neg_sentiment,
       }));
 
       setAnalysisEntries(mapped);
