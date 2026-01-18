@@ -1,4 +1,5 @@
-// app/reflection/page.tsx
+// THIS FILE GOES IN: app/reflection/page.tsx
+
 import ReflectionView from "./_components/reflection-view";
 import Link from "next/link";
 import { Home } from "lucide-react";

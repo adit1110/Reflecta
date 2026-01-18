@@ -1,9 +1,12 @@
+// THIS FILE GOES IN: app/journal/[id]/page.tsx
+// (note the square brackets around "id" - that's Next.js dynamic routing)
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Home, ArrowLeft } from "lucide-react";
+import { Home, ArrowLeft, Sparkles } from "lucide-react";
 import { supabase } from "../../../lib/supabase-browser";
 
 type JournalEntry = {
@@ -61,6 +64,23 @@ function ShiftBadge({
     >
       {label}
     </span>
+  );
+}
+
+function NotebookSpiralBinding() {
+  return (
+    <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#FFE8D6] to-transparent flex flex-col justify-start gap-8 pt-8 items-center z-10">
+      {[...Array(12)].map((_, i) => (
+        <div key={i} className="relative">
+          {/* Hole shadow */}
+          <div className="w-6 h-6 rounded-full bg-[#CB997E]/30 blur-sm absolute inset-0"></div>
+          {/* Hole */}
+          <div className="w-6 h-6 rounded-full border-2 border-[#CB997E]/40 bg-[#FFE8D6] relative"></div>
+          {/* Inner shadow */}
+          <div className="w-3 h-3 rounded-full bg-[#CB997E]/20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -262,27 +282,160 @@ export default function JournalDetailPage() {
           </div>
         )}
 
-        {/* Notebook card with spiral binding */}
-        <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden">
-          {/* Spiral binding holes */}
-          <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#FFE8D6] to-transparent flex flex-col justify-start gap-8 pt-8 items-center z-10">
-            {[...Array(12)].map((_, i) => (
-              <div key={i} className="relative">
-                {/* Hole shadow */}
-                <div className="w-6 h-6 rounded-full bg-[#CB997E]/30 blur-sm absolute inset-0"></div>
-                {/* Hole */}
-                <div className="w-6 h-6 rounded-full border-2 border-[#CB997E]/40 bg-[#FFE8D6] relative"></div>
-                {/* Inner shadow */}
-                <div className="w-3 h-3 rounded-full bg-[#CB997E]/20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+        {/* AI Summary & Video - Notebook style */}
+        {(state.summary?.summary || state.summary?.video_url) && (
+          <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <NotebookSpiralBinding />
+
+            {/* Notebook paper with lines */}
+            <div className="relative pl-16 pr-8">
+              {/* Red margin line */}
+              <div className="absolute left-20 top-0 bottom-0 w-[2px] bg-[#FF9F1C]/30"></div>
+
+              {/* AI Summary Header */}
+              <div className="pt-8 px-8 md:px-12 pl-8 pb-4 border-b-2 border-[#FFBF69]/30">
+                <div className="flex items-center gap-3">
+                  <Sparkles className="w-5 h-5 text-[#FF9F1C]" />
+                  <h2 className="text-xl font-medium text-[#FF9F1C]">
+                    AI Summary
+                  </h2>
+                </div>
+                <p className="mt-2 text-sm text-[#CB997E]/70 font-light italic">
+                  An AI-generated reflection on your entry
+                </p>
               </div>
-            ))}
+
+              {/* Video Player Section */}
+              {state.summary?.video_url ? (
+                <div className="px-8 md:px-12 pl-8 pt-6 pb-6">
+                  <div className="max-w-xl mx-auto">
+                    <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-[#FFF5EC] to-[#FFE8D6] p-3 shadow-lg border-2 border-[#FFBF69]/40">
+                      <div className="mb-2 flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#FF9F1C] to-[#FFBF69] flex items-center justify-center">
+                          <Sparkles className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="text-xs font-medium text-[#CB997E]">
+                          Mascot's Reflection
+                        </span>
+                      </div>
+                      
+                      <div className="relative rounded-xl overflow-hidden shadow-md bg-black">
+                        <video
+                          src={state.summary.video_url}
+                          controls
+                          className="w-full aspect-video object-contain"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="px-8 md:px-12 pl-8 pt-6 pb-6">
+                  <div className="max-w-xl mx-auto flex flex-col items-center gap-3">
+                    <p className="text-sm text-[#CB997E]/70 font-light italic text-center">
+                      Video is being generated for this entry...
+                    </p>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const journalId = Array.isArray(params?.id)
+                          ? params?.id[0]
+                          : params?.id;
+                        if (!journalId) return;
+                        setIsGeneratingVideo(true);
+                        setVideoError(null);
+                        try {
+                          const res = await fetch("/api/video/generate", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ journal_id: journalId }),
+                          });
+                          
+                          if (res.status === 403 || res.status === 401) {
+                            setVideoError("Authentication error. Please refresh and log in again.");
+                            return;
+                          }
+                          
+                          const data = await res.json();
+                          if (data.video_url) {
+                            setState((prev) => ({
+                              ...prev,
+                              summary: prev.summary
+                                ? { ...prev.summary, video_url: data.video_url }
+                                : { summary: null, video_url: data.video_url },
+                            }));
+                          } else {
+                            setVideoError("Video generation failed.");
+                          }
+                        } catch {
+                          setVideoError("Video generation failed.");
+                        } finally {
+                          setIsGeneratingVideo(false);
+                        }
+                      }}
+                      className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#FF9F1C] to-[#FFBF69] text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={isGeneratingVideo}
+                    >
+                      {isGeneratingVideo ? "Generating..." : "Generate Video Now"}
+                    </button>
+                    {videoError && (
+                      <p className="text-xs text-red-600 font-light text-center">
+                        {videoError}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Divider */}
+              {state.summary?.summary && (
+                <div className="px-8 md:px-12 pl-8">
+                  <div className="border-t-2 border-[#CB997E]/20"></div>
+                </div>
+              )}
+
+              {/* AI Summary Text */}
+              {state.summary?.summary && (
+                <div
+                  className="w-full min-h-[20vh] p-8 md:p-12 pl-8 text-lg md:text-xl text-[#CB997E] leading-[2.5rem] relative z-20 font-light"
+                  style={{
+                    backgroundImage: `repeating-linear-gradient(
+                      transparent,
+                      transparent 2.4rem,
+                      #CB997E15 2.4rem,
+                      #CB997E15 2.5rem
+                    )`,
+                    backgroundAttachment: 'local',
+                  }}
+                >
+                  {state.summary.summary.split("\n\n").map((paragraph, idx) => (
+                    <p key={idx} className="mb-6 last:mb-0">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+        )}
+
+        {/* Original Journal Entry - Notebook style */}
+        <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden">
+          <NotebookSpiralBinding />
 
           {/* Notebook paper with lines */}
           <div className="relative pl-16 pr-8">
             {/* Red margin line */}
             <div className="absolute left-20 top-0 bottom-0 w-[2px] bg-[#FF9F1C]/30"></div>
 
+            {/* Journal Entry Header */}
+            <div className="pt-8 px-8 md:px-12 pl-8 pb-4 border-b-2 border-[#CB997E]/30">
+              <h2 className="text-xl font-medium text-[#CB997E]">
+                Your Journal Entry
+              </h2>
+            </div>
+
+            {/* Journal Entry Content */}
             <div
               className="w-full min-h-[50vh] p-8 md:p-12 pl-8 text-lg md:text-xl text-[#CB997E] leading-[2.5rem] relative z-20 font-light"
               style={{
@@ -303,81 +456,6 @@ export default function JournalDetailPage() {
             </div>
           </div>
         </div>
-
-        {(state.summary?.summary || state.summary?.video_url) && (
-          <section className="rounded-3xl bg-white/70 backdrop-blur-md p-6 shadow-2xl border border-[#CB997E]/20">
-            <h2 className="text-lg font-light text-[#CB997E]">AI Summary</h2>
-            {state.summary?.summary && (
-              <p className="mt-3 text-base text-[#CB997E]/80 font-light leading-relaxed">
-                {state.summary.summary}
-              </p>
-            )}
-            {state.summary?.video_url ? (
-              <div className="mt-5">
-                <video
-                  src={state.summary.video_url}
-                  controls
-                  className="w-full rounded-2xl border border-[#CB997E]/20 shadow-lg"
-                />
-              </div>
-            ) : (
-              <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <p className="text-sm text-[#CB997E]/70 font-light">
-                  Video is generating...
-                </p>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const journalId = Array.isArray(params?.id)
-                      ? params?.id[0]
-                      : params?.id;
-                    if (!journalId) return;
-                    setIsGeneratingVideo(true);
-                    setVideoError(null);
-                    try {
-                      const res = await fetch("/api/video/generate", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ journal_id: journalId }),
-                      });
-                      
-                      // Handle auth errors
-                      if (res.status === 403 || res.status === 401) {
-                        setVideoError("Authentication error. Please refresh the page and log in again.");
-                        return;
-                      }
-                      
-                      const data = await res.json();
-                      if (data.video_url) {
-                        setState((prev) => ({
-                          ...prev,
-                          summary: prev.summary
-                            ? { ...prev.summary, video_url: data.video_url }
-                            : { summary: null, video_url: data.video_url },
-                        }));
-                      } else {
-                        setVideoError("Video generation failed.");
-                      }
-                    } catch {
-                      setVideoError("Video generation failed.");
-                    } finally {
-                      setIsGeneratingVideo(false);
-                    }
-                  }}
-                  className="px-4 py-2 rounded-full border border-[#CB997E]/40 text-[#CB997E] text-sm font-medium hover:bg-[#CB997E] hover:text-[#FFE8D6] transition-all duration-300 disabled:opacity-50"
-                  disabled={isGeneratingVideo}
-                >
-                  {isGeneratingVideo ? "Generating..." : "Generate video"}
-                </button>
-                {videoError && (
-                  <span className="text-xs text-[#CB997E]/70 font-light">
-                    {videoError}
-                  </span>
-                )}
-              </div>
-            )}
-          </section>
-        )}
       </div>
     </main>
   );
