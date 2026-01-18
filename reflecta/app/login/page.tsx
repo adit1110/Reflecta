@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "../../lib/supabase-browser";
+import error from "next/error";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -56,6 +57,22 @@ export default function LoginPage() {
       setErrorMessage("Something went wrong. Try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setErrorMessage(null);
+    if (!supabase) {
+      setErrorMessage("App misconfigured. Missing Supabase keys.");
+      return;
+    }
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+
+    if (error) {
+      setErrorMessage(error.message || "Failed to sign in with Google.");
     }
   };
 
@@ -114,8 +131,44 @@ export default function LoginPage() {
             disabled={isLoading}
             className="w-full py-3 rounded-lg bg-[#FF9F1C] text-white font-medium hover:bg-[#FFBF69] transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Logging in..." : "Log in"}
+            {isLoading ? "Logging in..." : "Log In"}
           </button>
+
+          <div className="mt-4">
+              <button
+  type="button"
+  onClick={handleGoogleSignIn}
+  className="w-full py-3 rounded-lg border border-[#CB997E]/40 bg-white text-[#CB997E] font-medium hover:bg-[#FFF5EC] transition-all duration-300 flex items-center justify-center gap-3"
+>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 48 48"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fill="#EA4335"
+      d="M24 9.5c3.2 0 5.3 1.4 6.5 2.5l4.8-4.8C32.4 4.4 28.6 2.5 24 2.5 14.9 2.5 7.3 8.6 4.6 16.9l5.9 4.6C12 14.8 17.5 9.5 24 9.5z"
+    />
+    <path
+      fill="#4285F4"
+      d="M46.5 24.5c0-1.5-.1-2.6-.3-3.8H24v7.2h12.9c-.6 3-2.4 5.5-5.1 7.2l5.8 4.5c3.4-3.1 5.9-7.6 5.9-15.1z"
+    />
+    <path
+      fill="#FBBC05"
+      d="M10.5 28.5c-.6-1.5-1-3.1-1-4.7s.4-3.2 1-4.7l-5.9-4.6C3.1 17.6 2.5 21 2.5 24.5s.6 6.9 2.1 9.9l5.9-4.6z"
+    />
+    <path
+      fill="#34A853"
+      d="M24 46.5c4.6 0 8.4-1.5 11.2-4.1l-5.8-4.5c-1.6 1.1-3.7 1.8-5.4 1.8-6.5 0-12-5.3-13.5-12.4l-5.9 4.6C7.3 40.4 14.9 46.5 24 46.5z"
+    />
+  </svg>
+
+  <span>Continue with Google</span>
+</button>
+
+            </div>
+
           {errorMessage ? (
             <p className="text-sm text-red-500 text-center">{errorMessage}</p>
           ) : null}
