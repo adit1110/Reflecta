@@ -124,7 +124,7 @@ export default function IdentityShiftTimeline({
             dataKey="date"
             tickLine={false}
             axisLine={false}
-            tick={{ fontSize: 12, fill: "#CB997E" }}
+            tick={{ fontSize: 14, fill: "#CB997E" }}
             interval="preserveStartEnd"
             minTickGap={18}
           />
@@ -132,8 +132,8 @@ export default function IdentityShiftTimeline({
             domain={[0, 100]}
             tickLine={false}
             axisLine={false}
-            tick={{ fontSize: 12, fill: "#CB997E" }}
-            width={32}
+            tick={{ fontSize: 14, fill: "#CB997E" }}
+            width={38}
           />
           <Tooltip
             labelFormatter={formatTooltipLabel}
@@ -144,10 +144,12 @@ export default function IdentityShiftTimeline({
               background: "rgba(255, 255, 255, 0.95)",
               boxShadow: "0 8px 30px rgba(255, 159, 28, 0.15)",
               color: "#CB997E",
+              fontSize: 14,
             }}
             labelStyle={{
               color: "#CB997E",
               fontWeight: 500,
+              fontSize: 14,
             }}
           />
           <Line
